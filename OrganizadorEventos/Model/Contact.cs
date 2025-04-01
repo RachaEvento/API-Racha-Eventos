@@ -8,6 +8,6 @@ public class Contact
     public string UserId { get; set; } = string.Empty;
     public User User { get; set; }
     
-    public ICollection<Event> Events { get; set; } = new();
+    public ICollection<Event> Events { get; set; }
     public ICollection<EventParticipants> EventParticipants { get; set; } = new List<EventParticipants>();
 }

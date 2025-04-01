@@ -13,7 +13,7 @@ public class Event
     public DateTime CreatedAt { get; set; }
 
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
-    public ICollection<EventCost> EventCosts { get; set; } = new();
-    public ICollection<Contact> Contacts { get; set; } = new();
+    public ICollection<EventCost> EventCosts { get; set; }
+    public ICollection<Contact> Contacts { get; set; } 
     public ICollection<EventParticipants> EventParticipants { get; set; } = new List<EventParticipants>();
 }
