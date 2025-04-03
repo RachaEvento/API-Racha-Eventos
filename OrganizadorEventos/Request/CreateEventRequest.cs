@@ -4,6 +4,7 @@ public class CreateEventRequest
 {
     public string Name { get; set; }
     public string Description { get; set; }
+    public Guid? LocationId { get; set; }
     public DateTime Date { get; set; }
     public decimal TotalPrice { get; set; }
     public int MaxParticipants { get; set; }

@@ -1,3 +1,4 @@
+using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Model;
 using OrganizadorEventos.Request;
@@ -9,16 +10,18 @@ public class EventService : IEventService
     private readonly IContactRepository _contactRepository;
     private readonly IEventCostRepository _eventCostRepository;
     private readonly IEventRepository _eventRepository;
+    private readonly ILocationRepository _locationRepository;
 
     public EventService(IEventRepository eventRepository, IContactRepository contactRepository,
-        IEventCostRepository eventCostRepository)
+        IEventCostRepository eventCostRepository, ILocationRepository locationRepository)
     {
         _eventRepository = eventRepository;
         _contactRepository = contactRepository;
         _eventCostRepository = eventCostRepository;
+        _locationRepository = locationRepository;
     }
 
-    public async Task<Event> CreateEventAsync(CreateEventRequest request)
+    public async Task<Event> CreateEventAsync(CreateEventRequest request, string userId)
     {
         var evento = new Event
         {
@@ -28,12 +31,27 @@ public class EventService : IEventService
             TotalPrice = request.TotalPrice,
             MaxParticipants = request.MaxParticipants,
             CreatedAt = DateTime.UtcNow,
+            Status = EventStatus.Aberto,
+            UserId = userId,
             EventParticipants = new List<EventParticipants>()
         };
+        if (request.LocationId.HasValue)
+        {
+            var location = await _locationRepository.GetLocationByIdAsync(request.LocationId.Value);
+            if (location != null)
+            {
+                evento.LocationId = location.Id;
+                evento.Location = location;
+            }
+            else
+            {
+                throw new ArgumentException($"Localização com ID {request.LocationId} não encontrada.");
+            }
+        }
 
         foreach (var contactId in request.ContactIds)
         {
-            var contact = await _contactRepository.GetContactByIdAsync(contactId);
+            var contact = await _contactRepository.GetContactByIdAsync(contactId, userId);
             if (contact == null)
                 throw new ArgumentException($"Contato com ID {contactId} não encontrado.");
 
@@ -53,7 +71,7 @@ public class EventService : IEventService
     }
 
     public async Task<Event> AddContactsToEventAsync(Guid eventId, List<Guid> contactIds,
-        List<Guid> isPayingParticipants, List<Guid> isHalfPriceParticipants)
+        List<Guid> isPayingParticipants, List<Guid> isHalfPriceParticipants, string userId)
     {
         var evento = await _eventRepository.GetEventByIdAsync(eventId);
         if (evento == null)
@@ -61,7 +79,7 @@ public class EventService : IEventService
 
         foreach (var contactId in contactIds)
         {
-            var contact = await _contactRepository.GetContactByIdAsync(contactId);
+            var contact = await _contactRepository.GetContactByIdAsync(contactId, userId);
             if (contact == null)
                 throw new ArgumentException($"Contato com ID {contactId} não encontrado.");
 
@@ -108,39 +126,6 @@ public class EventService : IEventService
         return newCost;
     }
 
-    public async Task<Event> FinalizeEventAsync(Guid eventId)
-    {
-        var evento = await _eventRepository.GetEventByIdAsync(eventId);
-        if (evento == null)
-            throw new ArgumentException($"Evento com ID {eventId} não encontrado.");
-
-        if (evento.IsFinalized)
-            throw new InvalidOperationException("Este evento já foi finalizado.");
-
-        var payingParticipants = evento.EventParticipants.Count(ep => ep.IsPaying);
-
-        if (payingParticipants == 0)
-            throw new InvalidOperationException("Não há participantes que irão pagar.");
-
-        decimal totalAmountToPay = 0;
-
-        foreach (var participant in evento.EventParticipants)
-            if (participant.IsPaying)
-            {
-                if (participant.IsHalfPrice)
-                    totalAmountToPay += evento.TotalPrice / 2;
-                else
-                    totalAmountToPay += evento.TotalPrice;
-            }
-
-        evento.PricePerParticipant = totalAmountToPay / payingParticipants;
-
-        evento.IsFinalized = true;
-
-        await _eventRepository.UpdateEventAsync(evento);
-
-        return evento;
-    }
 
     public async Task<List<EventCost>> GetEventCostsAsync(Guid eventId)
     {

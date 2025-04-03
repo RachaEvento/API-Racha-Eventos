@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Request;
@@ -15,15 +16,18 @@ public class EventController : ControllerBase
         _eventService = eventService;
     }
 
-    [HttpPost("create")]
+    [HttpPost("createEvent")]
     public async Task<IActionResult> CreateEvent([FromBody] CreateEventRequest request)
     {
         if (request == null || string.IsNullOrEmpty(request.Name))
             return BadRequest("Dados inválidos para criar um evento.");
 
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            throw new UnauthorizedAccessException("Usuário não autenticado.");
         try
         {
-            await _eventService.CreateEventAsync(request);
+            await _eventService.CreateEventAsync(request, userId);
             return Ok("Evento Criado com sucesso");
         }
         catch (Exception ex)
@@ -38,10 +42,14 @@ public class EventController : ControllerBase
         if (request.ContactIds == null || request.ContactIds.Count == 0)
             return BadRequest("Pelo menos um contato deve ser fornecido.");
 
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            throw new UnauthorizedAccessException("Usuário não autenticado.");
+
         try
         {
             var updatedEvent = await _eventService.AddContactsToEventAsync(eventId, request.ContactIds,
-                request.IsPayingParticipants, request.IsHalfPriceParticipants);
+                request.IsPayingParticipants, request.IsHalfPriceParticipants, userId);
             return Ok(updatedEvent);
         }
         catch (Exception ex)
@@ -50,7 +58,7 @@ public class EventController : ControllerBase
         }
     }
 
-    [HttpPost("finalizeEvent/{eventId}")]
+    /*[HttpPost("finalizeEvent/{eventId}")]
     public async Task<IActionResult> FinalizeEvent(Guid eventId)
     {
         try
@@ -62,7 +70,7 @@ public class EventController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-    }
+    }*/
 
     [HttpPost("addCosts/{eventId}")]
     public async Task<IActionResult> AddCost(Guid eventId, [FromBody] AddCostRequest request)

@@ -16,6 +16,7 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<Contact> Contacts { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<Location> Locations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

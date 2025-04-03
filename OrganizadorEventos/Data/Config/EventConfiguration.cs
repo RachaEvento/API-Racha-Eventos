@@ -22,5 +22,10 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
         builder.HasMany(e => e.EventCosts)
             .WithOne()
             .HasForeignKey(c => c.EventId);
+
+        builder.HasOne(e => e.Location)
+            .WithOne()
+            .HasForeignKey<Event>(e => e.LocationId)
+            .OnDelete(DeleteBehavior.SetNull); // Caso o local seja removido, mantém o evento sem localização
     }
 }
