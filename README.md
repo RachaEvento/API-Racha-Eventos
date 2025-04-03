@@ -1,2 +1,2 @@
 # BACKEND
-Backend da aplicação RachaEvento
+Backend da aplicação RachaEvent
