@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Model;
 using OrganizadorEventos.Request;
@@ -34,6 +35,35 @@ public class AuthService : IAuthService
 
         var roles = await _userManager.GetRolesAsync(user);
 
+        return GenerateJwtToken(user, roles);
+    }
+
+    public async Task<string> RegisterUserAsync(CreateUserRequest createUserRequest)
+    {
+        var existingUser = await _userManager.FindByEmailAsync(createUserRequest.Email);
+        if (existingUser != null)
+            throw new ArgumentException("Já existe um usuário com este email.");
+
+        var user = new User
+        {
+            Nome = createUserRequest.Nome,
+            UserName = createUserRequest.Email,
+            Email = createUserRequest.Email,
+            Numero = createUserRequest.Numero,
+            
+        };
+
+        var result = await _userManager.CreateAsync(user, createUserRequest.Password);
+
+        if (!result.Succeeded)
+        {
+            var erros = result.Errors.Select(e => e.Description).ToList();
+            throw new ArgumentException(string.Join("; ", erros));
+        }
+
+        await _userManager.AddToRoleAsync(user, UserRole.Usuario.ToString());
+
+        var roles = await _userManager.GetRolesAsync(user);
         return GenerateJwtToken(user, roles);
     }
 

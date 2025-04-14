@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Request;
+using OrganizadorEventos.Response;
 
 namespace OrganizadorEventos.Controllers;
 
@@ -19,16 +20,37 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
     {
         if (loginRequest == null)
-            return BadRequest("Dados de login não fornecidos.");
+            return BadRequest(
+                GenericResponse<string>.ErroResponse(new List<string> { "Dados de login não fornecidos." }));
 
         try
         {
             var token = await _authService.LoginAsync(loginRequest);
-            return Ok(new { Token = token });
+            return Ok(GenericResponse<string>.SucessoResponse(token, "Login realizado com sucesso."));
         }
         catch (ArgumentException ex)
         {
-            return Unauthorized(new { ex.Message });
+            return Unauthorized(
+                GenericResponse<string>.ErroResponse(new List<string> { ex.Message }, "Erro ao fazer login."));
+        }
+    }
+
+    [HttpPost("registrarUser")]
+    public async Task<IActionResult> RegisterUser([FromBody] CreateUserRequest createUserRequest)
+    {
+        if (createUserRequest == null)
+            return BadRequest(GenericResponse<string>.ErroResponse(new List<string>
+                { "Dados do usuário não fornecidos." }));
+
+        try
+        {
+            var token = await _authService.RegisterUserAsync(createUserRequest);
+            return Ok(GenericResponse<string>.SucessoResponse(token, "Usuário registrado com sucesso."));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(GenericResponse<string>.ErroResponse(new List<string> { ex.Message },
+                "Erro ao registrar usuário."));
         }
     }
 }

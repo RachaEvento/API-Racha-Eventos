@@ -4,6 +4,7 @@ using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Model;
 using OrganizadorEventos.Request;
+using OrganizadorEventos.Response;
 
 namespace OrganizadorEventos.Controllers;
 
@@ -27,7 +28,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
         if (request == null)
-            return BadRequest("Usuário não pode ser nulo.");
+            return BadRequest(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não pode ser nulo." }));
 
         try
         {
@@ -44,18 +45,24 @@ public class UserController : ControllerBase
             var result = await _userManager.CreateAsync(user, request.Password);
 
             if (!result.Succeeded)
-                return BadRequest(string.Join(", ", result.Errors.Select(e => e.Description)));
+            {
+                var erros = result.Errors.Select(e => e.Description).ToList();
+                return BadRequest(GenericResponse<string>.ErroResponse(erros, "Erro ao criar usuário."));
+            }
 
             await _userManager.AddToRoleAsync(user, rolePadrao);
 
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+            return CreatedAtAction(
+                nameof(GetUserById),
+                new { id = user.Id },
+                GenericResponse<User>.SucessoResponse(user, "Usuário criado com sucesso.")
+            );
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(GenericResponse<string>.ErroResponse(new List<string> { ex.Message }));
         }
     }
-
 
     [HttpGet("getUser/{id}")]
     public async Task<IActionResult> GetUserById(string id)
@@ -63,8 +70,8 @@ public class UserController : ControllerBase
         var user = await _userRepository.GetUserByIdAsync(id);
 
         if (user == null)
-            return NotFound();
+            return NotFound(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
 
-        return Ok(user);
+        return Ok(GenericResponse<User>.SucessoResponse(user, "Usuário encontrado com sucesso."));
     }
 }
