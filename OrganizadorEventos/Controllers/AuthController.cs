@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OrganizadorEventos.Interfaces;
+using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Request;
 using OrganizadorEventos.Response;
 
@@ -35,16 +36,16 @@ public class AuthController : ControllerBase
         }
     }
 
-    [HttpPost("registrarUser")]
-    public async Task<IActionResult> RegisterUser([FromBody] CreateUserRequest createUserRequest)
+    [HttpPost("register")]
+    public async Task<IActionResult> RegisterUser([FromBody] RegisterRequest registerRequest)
     {
-        if (createUserRequest == null)
+        if (registerRequest == null)
             return BadRequest(GenericResponse<string>.ErroResponse(new List<string>
                 { "Dados do usuário não fornecidos." }));
 
         try
         {
-            var token = await _authService.RegisterUserAsync(createUserRequest);
+            var token = await _authService.RegisterAsync(registerRequest);
             return Ok(GenericResponse<string>.SucessoResponse(token, "Usuário registrado com sucesso."));
         }
         catch (ArgumentException ex)

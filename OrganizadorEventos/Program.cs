@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OrganizadorEventos;
 using OrganizadorEventos.Data;
 using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces;
+using OrganizadorEventos.Interfaces.Repositories;
+using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Model;
 using OrganizadorEventos.Repository;
 using OrganizadorEventos.Services;
@@ -53,31 +56,21 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddIdentity<User, IdentityRole>()
+builder.Services.AddIdentity<Usuario, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IEventRepository, EventRepository>();
-builder.Services.AddScoped<IEventService, EventService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IContactRepository, ContactRepository>();
-builder.Services.AddScoped<IEventCostRepository, EventCostRepository>();
-builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+//Repos
+builder.Services.AddScoped<IEventoRepository, EventoRepository>();
+builder.Services.AddScoped<IContatoRepository, ContatoRepository>();
+builder.Services.AddScoped<ILocalRepository, LocalRepository>();
 
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = false, // Em produção, você pode querer validar o emissor
-            ValidateAudience = false, // Em produção, você pode querer validar a audiência
-            ValidateLifetime = true, // Verifica a validade do token
-            IssuerSigningKey =
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
-        };
-    });
+//Services
+builder.Services.AddScoped<IEventoService, EventoService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IContatoService, ContatoService>();
+
+builder.Services.RegisterJWT(builder.Configuration);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(Environment.GetEnvironmentVariable("POSTGRES_CONNECTION")));
@@ -102,7 +95,14 @@ app.UseAuthorization();
 app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var services = scope.ServiceProvider;
+    
+    var context = services.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
+    
+    var userManager = services.GetRequiredService<UserManager<Usuario>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    await Startup.SeedDefaultUserAsync(userManager, roleManager);
 
     foreach (var role in Enum.GetNames(typeof(UserRole)))
         if (!await roleManager.RoleExistsAsync(role))

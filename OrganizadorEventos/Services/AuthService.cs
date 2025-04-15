@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces;
+using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Model;
 using OrganizadorEventos.Request;
 
@@ -13,9 +14,9 @@ namespace OrganizadorEventos.Services;
 public class AuthService : IAuthService
 {
     private readonly IConfiguration _configuration;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<Usuario> _userManager;
 
-    public AuthService(UserManager<User> userManager, IConfiguration configuration)
+    public AuthService(UserManager<Usuario> userManager, IConfiguration configuration)
     {
         _userManager = userManager;
         _configuration = configuration;
@@ -38,22 +39,20 @@ public class AuthService : IAuthService
         return GenerateJwtToken(user, roles);
     }
 
-    public async Task<string> RegisterUserAsync(CreateUserRequest createUserRequest)
+    public async Task<string> RegisterAsync(RegisterRequest registerRequest)
     {
-        var existingUser = await _userManager.FindByEmailAsync(createUserRequest.Email);
+        var existingUser = await _userManager.FindByEmailAsync(registerRequest.Email);
         if (existingUser != null)
             throw new ArgumentException("Já existe um usuário com este email.");
 
-        var user = new User
+        var user = new Usuario
         {
-            Nome = createUserRequest.Nome,
-            UserName = createUserRequest.Email,
-            Email = createUserRequest.Email,
-            Numero = createUserRequest.Numero,
-            
+            UserName = registerRequest.Nome,
+            Email = registerRequest.Email,
+            PhoneNumber = registerRequest.Numero,
         };
 
-        var result = await _userManager.CreateAsync(user, createUserRequest.Password);
+        var result = await _userManager.CreateAsync(user, registerRequest.Password);
 
         if (!result.Succeeded)
         {
@@ -67,16 +66,16 @@ public class AuthService : IAuthService
         return GenerateJwtToken(user, roles);
     }
 
-
-    private string GenerateJwtToken(User user, IList<string> roles)
+    // Método que gera o token JWT
+    private string GenerateJwtToken(Usuario usuario, IList<string> roles)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id),
-            new(JwtRegisteredClaimNames.Email, user.Email),
+            new(JwtRegisteredClaimNames.Sub, usuario.Id),
+            new(JwtRegisteredClaimNames.Email, usuario.Email),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

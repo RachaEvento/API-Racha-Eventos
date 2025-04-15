@@ -5,18 +5,21 @@ using OrganizadorEventos.Model;
 
 namespace OrganizadorEventos.Data;
 
-public class AppDbContext : IdentityDbContext<User>
+public class AppDbContext : IdentityDbContext<Usuario>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
+        
     }
-
-    public DbSet<EventParticipants> EventParticipants { get; set; }
-    public DbSet<EventCost> EventCosts { get; set; }
-    public DbSet<Contact> Contacts { get; set; }
-    public DbSet<Event> Events { get; set; }
-    public DbSet<Payment> Payments { get; set; }
-    public DbSet<Location> Locations { get; set; }
+    
+    public DbSet<Local> Locais { get; set; }
+    public DbSet<Evento> Eventos { get; set; }
+    public DbSet<ListaCusto> ListaCustos { get; set; }
+    public DbSet<Custo> Custos { get; set; }
+    public DbSet<Contato> Contatos { get; set; }
+    public DbSet<Participante> Participantes { get; set; }
+    public DbSet<ParticipanteListaCusto> ParticipanteListaCustos { get; set; }
+    public DbSet<PagamentoParticipante> PagamentoParticipantes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
