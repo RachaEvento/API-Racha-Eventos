@@ -1,0 +1,20 @@
+using OrganizadorEventos.Enum;
+
+namespace OrganizadorEventos.Model;
+
+public class Evento
+{
+    public Guid Id { get; set; }
+    public Guid UsuarioId { get; set; }
+    public Guid? LocalId { get; set; }
+    public string Nome { get; set; } = null!;
+    public string? Descricao { get; set; }
+    public DateTime DataInicio { get; set; }
+    public DateTime? DataFinal { get; set; }
+    public int Status { get; set; }
+
+    public Usuario Usuario { get; set; } = null!;
+    public Local? Local { get; set; }
+    public ICollection<ListaCusto> ListaCustos { get; set; } = new List<ListaCusto>();
+    public ICollection<Participante> Participantes { get; set; } = new List<Participante>();
+}
