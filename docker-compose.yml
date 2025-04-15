@@ -20,7 +20,8 @@ services:
     build:
       context: .
       dockerfile: OrganizadorEventos/Dockerfile
-    container_name: api-racha-eventos
+    container_name: api-racha-eventos    
+    restart: always
     depends_on:
       - postgres
     ports:
