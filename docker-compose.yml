@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:14.1-alpine
+    container_name: "postgres-racha-eventos"
+    restart: always
+    ports:
+      - "5440:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=organizador
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - racha-eventos_network
+
+  organizadoreventos:
+    build:
+      context: .
+      dockerfile: OrganizadorEventos/Dockerfile
+    container_name: api-racha-eventos
+    depends_on:
+      - postgres
+    ports:
+      - "80:80"
+    env_file:
+      - OrganizadorEventos/settings.env
+    working_dir: /app
+    networks:
+      - racha-eventos_network
+    command: ["dotnet", "OrganizadorEventos.dll"]
+
+volumes:
+  postgres_data:
+
+networks:
+  racha-eventos_network:
+    driver: bridge
