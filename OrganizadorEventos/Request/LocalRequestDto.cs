@@ -1,15 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OrganizadorEventos.Model;
+namespace OrganizadorEventos.Request;
 
-public class Local
+public class LocalRequest
 {
     public Guid LocalId { get; set; }
-    public string DescricaoLocal { get; set; }
 
     [Required] public string Nome { get; set; }
 
     [Required] public string Endereco { get; set; }
+
+    [Required] public string DescricaoLocal { get; set; }
 
     [Required] public string Bairro { get; set; }
 
@@ -21,8 +22,5 @@ public class Local
 
     public bool Ativo { get; set; } = true;
 
-    [Required] 
-    public string UsuarioId { get; set; }
-
-    public ApplicationUser Usuario { get; set; }
+    [Required] public string UsuarioId { get; set; }
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace OrganizadorEventos.Model;
+﻿namespace OrganizadorEventos.Model;
 
 public class Custo
 {

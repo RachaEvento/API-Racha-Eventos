@@ -2,7 +2,7 @@
 
 namespace OrganizadorEventos.Services;
 
-public abstract class CrudService<T> :  ICrudService<T> where T : class
+public abstract class CrudService<T> : ICrudService<T> where T : class
 {
     private readonly ICrudRepository<T> _repository;
 

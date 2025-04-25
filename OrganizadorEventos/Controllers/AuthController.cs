@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Request;
 using OrganizadorEventos.Response;

@@ -1,13 +1,9 @@
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OrganizadorEventos;
 using OrganizadorEventos.Data;
 using OrganizadorEventos.Enum;
-using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Model;
@@ -56,7 +52,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddIdentity<Usuario, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -96,11 +92,11 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    
+
     var context = services.GetRequiredService<AppDbContext>();
     context.Database.Migrate();
-    
-    var userManager = services.GetRequiredService<UserManager<Usuario>>();
+
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     await Startup.SeedDefaultUserAsync(userManager, roleManager);
 

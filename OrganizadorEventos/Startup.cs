@@ -9,15 +9,16 @@ namespace OrganizadorEventos;
 
 public static class Startup
 {
-    public static async Task SeedDefaultUserAsync(UserManager<Usuario> userManager, RoleManager<IdentityRole> roleManager)
+    public static async Task SeedDefaultUserAsync(UserManager<ApplicationUser> userManager,
+        RoleManager<IdentityRole> roleManager)
     {
-        string baseUserName = "User";
-        string baseUserEmail = "user@mail.com";
-        string baseUserPassword = "User@123";
+        var baseUserName = "User";
+        var baseUserEmail = "user@mail.com";
+        var baseUserPassword = "User@123";
 
         if (await userManager.FindByEmailAsync(baseUserEmail) == null)
         {
-            var baseUser = new Usuario()
+            var baseUser = new ApplicationUser
             {
                 UserName = baseUserName,
                 Email = baseUserEmail,
@@ -34,6 +35,7 @@ public static class Startup
             }
         }
     }
+
     public static void RegisterJWT(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAuthentication(authOptions =>
@@ -42,7 +44,7 @@ public static class Startup
             authOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(bearerOptions =>
         {
-            bearerOptions.TokenValidationParameters = new TokenValidationParameters()
+            bearerOptions.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,

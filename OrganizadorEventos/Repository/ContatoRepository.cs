@@ -1,9 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OrganizadorEventos.Data;
-using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Model;
-using OrganizadorEventos.Request;
 
 namespace OrganizadorEventos.Repository;
 
@@ -18,7 +16,7 @@ public class ContatoRepository : CrudRepository<Contato>, IContatoRepository
         _dbSet = context.Set<Contato>();
     }
 
-    public Task<List<Contato>> GetAllByUserAsync(Guid usuarioId)
+    public Task<List<Contato>> GetAllByUserAsync(string usuarioId)
     {
         return _dbSet.Where(c => c.UsuarioId == usuarioId).ToListAsync();
     }

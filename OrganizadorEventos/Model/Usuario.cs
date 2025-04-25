@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace OrganizadorEventos.Model;
 
-public class Usuario : IdentityUser
+public class ApplicationUser : IdentityUser
 {
     public ICollection<Local> Locais { get; set; } = new List<Local>();
     public ICollection<Evento> Eventos { get; set; } = new List<Evento>();

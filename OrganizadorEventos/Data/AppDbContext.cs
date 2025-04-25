@@ -5,13 +5,12 @@ using OrganizadorEventos.Model;
 
 namespace OrganizadorEventos.Data;
 
-public class AppDbContext : IdentityDbContext<Usuario>
+public class AppDbContext : IdentityDbContext<ApplicationUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
-        
     }
-    
+
     public DbSet<Local> Locais { get; set; }
     public DbSet<Evento> Eventos { get; set; }
     public DbSet<ListaCusto> ListaCustos { get; set; }

@@ -1,6 +1,4 @@
-using Microsoft.EntityFrameworkCore;
 using OrganizadorEventos.Data;
-using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Model;
 

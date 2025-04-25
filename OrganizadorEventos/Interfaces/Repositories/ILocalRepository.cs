@@ -4,5 +4,4 @@ namespace OrganizadorEventos.Interfaces.Repositories;
 
 public interface ILocalRepository : ICrudRepository<Local>
 {
-    
 }

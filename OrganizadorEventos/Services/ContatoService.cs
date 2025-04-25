@@ -8,12 +8,12 @@ public class ContatoService : CrudService<Contato>, IContatoService
 {
     private readonly IContatoRepository _contatoRepository;
 
-    public ContatoService(IContatoRepository contatoRepository) : base (contatoRepository)
+    public ContatoService(IContatoRepository contatoRepository) : base(contatoRepository)
     {
         _contatoRepository = contatoRepository;
     }
 
-    public Task<List<Contato>> GetAllByUserAsync(Guid userId)
+    public Task<List<Contato>> GetAllByUserAsync(string userId)
     {
         return _contatoRepository.GetAllByUserAsync(userId);
     }

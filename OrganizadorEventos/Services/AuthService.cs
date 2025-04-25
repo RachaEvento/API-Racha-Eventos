@@ -4,7 +4,6 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using OrganizadorEventos.Enum;
-using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Model;
 using OrganizadorEventos.Request;
@@ -14,9 +13,9 @@ namespace OrganizadorEventos.Services;
 public class AuthService : IAuthService
 {
     private readonly IConfiguration _configuration;
-    private readonly UserManager<Usuario> _userManager;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public AuthService(UserManager<Usuario> userManager, IConfiguration configuration)
+    public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
     {
         _userManager = userManager;
         _configuration = configuration;
@@ -45,11 +44,11 @@ public class AuthService : IAuthService
         if (existingUser != null)
             throw new ArgumentException("Já existe um usuário com este email.");
 
-        var user = new Usuario
+        var user = new ApplicationUser
         {
             UserName = registerRequest.Nome,
             Email = registerRequest.Email,
-            PhoneNumber = registerRequest.Numero,
+            PhoneNumber = registerRequest.Numero
         };
 
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
@@ -67,7 +66,7 @@ public class AuthService : IAuthService
     }
 
     // Método que gera o token JWT
-    private string GenerateJwtToken(Usuario usuario, IList<string> roles)
+    private string GenerateJwtToken(ApplicationUser usuario, IList<string> roles)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
