@@ -1,5 +1,3 @@
-using OrganizadorEventos.Enum;
-
 namespace OrganizadorEventos.Model;
 
 public class Evento

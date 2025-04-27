@@ -8,7 +8,7 @@ using OrganizadorEventos.Data;
 
 #nullable disable
 
-namespace OrganizadorEventos.Migrations
+namespace OrganizadorEventos.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -22,10 +22,11 @@ namespace OrganizadorEventos.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -48,7 +49,7 @@ namespace OrganizadorEventos.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -62,9 +63,8 @@ namespace OrganizadorEventos.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("text");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -73,7 +73,7 @@ namespace OrganizadorEventos.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -87,9 +87,8 @@ namespace OrganizadorEventos.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -98,7 +97,7 @@ namespace OrganizadorEventos.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
@@ -109,9 +108,8 @@ namespace OrganizadorEventos.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -120,13 +118,13 @@ namespace OrganizadorEventos.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("text");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -135,10 +133,10 @@ namespace OrganizadorEventos.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
@@ -178,12 +176,9 @@ namespace OrganizadorEventos.Migrations
                     b.Property<Guid>("UsuarioId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("UsuarioId1")
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UsuarioId1");
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("Contatos");
                 });
@@ -239,14 +234,11 @@ namespace OrganizadorEventos.Migrations
                     b.Property<Guid>("UsuarioId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("UsuarioId1")
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
                     b.HasIndex("LocalId");
 
-                    b.HasIndex("UsuarioId1");
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("Eventos");
                 });
@@ -277,6 +269,13 @@ namespace OrganizadorEventos.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Bairro")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Cidade")
                         .IsRequired()
                         .HasColumnType("text");
@@ -285,20 +284,21 @@ namespace OrganizadorEventos.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Endereco")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Estado")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
 
-                    b.Property<string>("Pais")
+                    b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Rua")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UsuarioId")
-                        .HasColumnType("text");
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -372,8 +372,9 @@ namespace OrganizadorEventos.Migrations
 
             modelBuilder.Entity("OrganizadorEventos.Model.Usuario", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
@@ -434,16 +435,16 @@ namespace OrganizadorEventos.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("OrganizadorEventos.Model.Usuario", null)
                         .WithMany()
@@ -452,7 +453,7 @@ namespace OrganizadorEventos.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("OrganizadorEventos.Model.Usuario", null)
                         .WithMany()
@@ -461,9 +462,9 @@ namespace OrganizadorEventos.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -476,7 +477,7 @@ namespace OrganizadorEventos.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("OrganizadorEventos.Model.Usuario", null)
                         .WithMany()
@@ -489,7 +490,9 @@ namespace OrganizadorEventos.Migrations
                 {
                     b.HasOne("OrganizadorEventos.Model.Usuario", "Usuario")
                         .WithMany("Contatos")
-                        .HasForeignKey("UsuarioId1");
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Usuario");
                 });
@@ -513,7 +516,9 @@ namespace OrganizadorEventos.Migrations
 
                     b.HasOne("OrganizadorEventos.Model.Usuario", "Usuario")
                         .WithMany("Eventos")
-                        .HasForeignKey("UsuarioId1");
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Local");
 
@@ -533,9 +538,13 @@ namespace OrganizadorEventos.Migrations
 
             modelBuilder.Entity("OrganizadorEventos.Model.Local", b =>
                 {
-                    b.HasOne("OrganizadorEventos.Model.Usuario", null)
+                    b.HasOne("OrganizadorEventos.Model.Usuario", "Usuario")
                         .WithMany("Locais")
-                        .HasForeignKey("UsuarioId");
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("OrganizadorEventos.Model.PagamentoParticipante", b =>

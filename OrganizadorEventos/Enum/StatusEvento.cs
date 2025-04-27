@@ -1,6 +1,6 @@
 namespace OrganizadorEventos.Enum;
 
-public enum EventStatus
+public enum StatusEvento
 {
     Aberto,
     Fechado,

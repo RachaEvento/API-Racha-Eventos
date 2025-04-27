@@ -8,13 +8,13 @@ public abstract class CrudRepository<T> : ICrudRepository<T> where T : class
 {
     protected readonly AppDbContext _context;
     protected readonly DbSet<T> _dbSet;
-    
+
     public CrudRepository(AppDbContext context)
     {
         _context = context;
         _dbSet = context.Set<T>();
     }
-    
+
     public virtual async Task<IEnumerable<T>> GetAllAsync()
     {
         return await _dbSet.ToListAsync();

@@ -1,0 +1,22 @@
+# This is a generated file. Not intended for manual editing.
+version: "3.8"
+services:
+  organizadoreventos:
+    build:
+      context: "C:\\Users\\migue\\Documentos\\GitHub\\API-Racha-Eventos"
+      dockerfile: "OrganizadorEventos/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/OrganizadorEventos.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "organizadoreventos:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\migue\\Documentos\\GitHub\\API-Racha-Eventos\\OrganizadorEventos:/app:rw"
+    - "C:\\Users\\migue\\Documentos\\GitHub\\API-Racha-Eventos:/src:rw"
+    - "C:\\Users\\migue\\.nuget\\packages:/root/.nuget/packages"
+    working_dir: "/app"

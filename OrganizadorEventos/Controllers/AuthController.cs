@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Interfaces.Services;
-using OrganizadorEventos.Request;
+using OrganizadorEventos.Request.Autenticacao;
 using OrganizadorEventos.Response;
 
 namespace OrganizadorEventos.Controllers;

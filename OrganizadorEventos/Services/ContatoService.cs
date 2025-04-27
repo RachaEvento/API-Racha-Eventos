@@ -8,7 +8,7 @@ public class ContatoService : CrudService<Contato>, IContatoService
 {
     private readonly IContatoRepository _contatoRepository;
 
-    public ContatoService(IContatoRepository contatoRepository) : base (contatoRepository)
+    public ContatoService(IContatoRepository contatoRepository) : base(contatoRepository)
     {
         _contatoRepository = contatoRepository;
     }

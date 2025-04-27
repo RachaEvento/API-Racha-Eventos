@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace OrganizadorEventos.Migrations
+namespace OrganizadorEventos.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,7 @@ namespace OrganizadorEventos.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
@@ -30,7 +30,7 @@ namespace OrganizadorEventos.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -57,7 +57,7 @@ namespace OrganizadorEventos.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RoleId = table.Column<string>(type: "text", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -78,7 +78,7 @@ namespace OrganizadorEventos.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -100,7 +100,7 @@ namespace OrganizadorEventos.Migrations
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     ProviderKey = table.Column<string>(type: "text", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<string>(type: "text", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,8 +117,8 @@ namespace OrganizadorEventos.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "text", nullable: false),
-                    RoleId = table.Column<string>(type: "text", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -141,7 +141,7 @@ namespace OrganizadorEventos.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
@@ -166,17 +166,17 @@ namespace OrganizadorEventos.Migrations
                     Nome = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     Telefone = table.Column<string>(type: "text", nullable: false),
-                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
-                    UsuarioId1 = table.Column<string>(type: "text", nullable: true)
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Contatos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Contatos_AspNetUsers_UsuarioId1",
-                        column: x => x.UsuarioId1,
+                        name: "FK_Contatos_AspNetUsers_UsuarioId",
+                        column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,12 +184,14 @@ namespace OrganizadorEventos.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Pais = table.Column<string>(type: "text", nullable: false),
-                    Estado = table.Column<string>(type: "text", nullable: false),
-                    Cidade = table.Column<string>(type: "text", nullable: false),
-                    Rua = table.Column<string>(type: "text", nullable: false),
+                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false),
                     DescricaoLocal = table.Column<string>(type: "text", nullable: false),
-                    UsuarioId = table.Column<string>(type: "text", nullable: true)
+                    Nome = table.Column<string>(type: "text", nullable: false),
+                    Endereco = table.Column<string>(type: "text", nullable: false),
+                    Bairro = table.Column<string>(type: "text", nullable: false),
+                    Cidade = table.Column<string>(type: "text", nullable: false),
+                    Estado = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -198,7 +200,8 @@ namespace OrganizadorEventos.Migrations
                         name: "FK_Locais_AspNetUsers_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -212,17 +215,17 @@ namespace OrganizadorEventos.Migrations
                     Descricao = table.Column<string>(type: "text", nullable: true),
                     DataInicio = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DataFinal = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    UsuarioId1 = table.Column<string>(type: "text", nullable: true)
+                    Status = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Eventos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Eventos_AspNetUsers_UsuarioId1",
-                        column: x => x.UsuarioId1,
+                        name: "FK_Eventos_AspNetUsers_UsuarioId",
+                        column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Eventos_Locais_LocalId",
                         column: x => x.LocalId,
@@ -377,9 +380,9 @@ namespace OrganizadorEventos.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Contatos_UsuarioId1",
+                name: "IX_Contatos_UsuarioId",
                 table: "Contatos",
-                column: "UsuarioId1");
+                column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Custos_ListaCustoId",
@@ -392,9 +395,9 @@ namespace OrganizadorEventos.Migrations
                 column: "LocalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Eventos_UsuarioId1",
+                name: "IX_Eventos_UsuarioId",
                 table: "Eventos",
-                column: "UsuarioId1");
+                column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ListaCustos_EventoId",

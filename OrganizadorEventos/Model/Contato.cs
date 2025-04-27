@@ -4,19 +4,8 @@ namespace OrganizadorEventos.Model;
 
 public class Contato
 {
-    public Guid Id { get; set; }
-    public Guid UsuarioId { get; set; }
-    public string Nome { get; set; } = null!;
-    public string Email { get; set; } = null!;
-    public string Telefone { get; set; } = null!;
-    public bool Ativo { get; set; }
-
-    public Usuario Usuario { get; set; } = null!;
-    public ICollection<Participante> Participantes { get; set; } = new List<Participante>();
-
     public Contato()
     {
-        
     }
 
     public Contato(ContatoRequest request, Guid usuarioId)
@@ -28,7 +17,7 @@ public class Contato
         Telefone = request.Telefone;
         Ativo = request.Ativo;
     }
-    
+
     public Contato(ContatoRequest request, Guid usuarioId, Guid id)
     {
         Id = id;
@@ -38,4 +27,14 @@ public class Contato
         Telefone = request.Telefone;
         Ativo = request.Ativo;
     }
+
+    public Guid Id { get; set; }
+    public Guid UsuarioId { get; set; }
+    public string Nome { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string Telefone { get; set; } = null!;
+    public bool Ativo { get; set; }
+
+    public Usuario Usuario { get; set; } = null!;
+    public ICollection<Participante> Participantes { get; set; } = new List<Participante>();
 }

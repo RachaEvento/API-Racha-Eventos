@@ -4,10 +4,9 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using OrganizadorEventos.Enum;
-using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Model;
-using OrganizadorEventos.Request;
+using OrganizadorEventos.Request.Autenticacao;
 
 namespace OrganizadorEventos.Services;
 
@@ -49,7 +48,7 @@ public class AuthService : IAuthService
         {
             UserName = registerRequest.Nome,
             Email = registerRequest.Email,
-            PhoneNumber = registerRequest.Numero,
+            PhoneNumber = registerRequest.Numero
         };
 
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
@@ -74,7 +73,8 @@ public class AuthService : IAuthService
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, usuario.Id),
+            new(JwtRegisteredClaimNames.Name, usuario.UserName),
+            new(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, usuario.Email),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };

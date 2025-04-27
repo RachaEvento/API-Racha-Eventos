@@ -10,5 +10,7 @@ public class Participante
     public Evento Evento { get; set; } = null!;
     public Contato Contato { get; set; } = null!;
     public PagamentoParticipante? Pagamento { get; set; }
-    public ICollection<ParticipanteListaCusto> ParticipanteListaCustos { get; set; } = new List<ParticipanteListaCusto>();
+
+    public ICollection<ParticipanteListaCusto> ParticipanteListaCustos { get; set; } =
+        new List<ParticipanteListaCusto>();
 }

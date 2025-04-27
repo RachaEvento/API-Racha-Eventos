@@ -1,4 +1,4 @@
-using OrganizadorEventos.Request;
+using OrganizadorEventos.Request.Autenticacao;
 
 namespace OrganizadorEventos.Interfaces.Services;
 

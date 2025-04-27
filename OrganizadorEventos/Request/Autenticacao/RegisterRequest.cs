@@ -1,4 +1,4 @@
-namespace OrganizadorEventos.Request;
+namespace OrganizadorEventos.Request.Autenticacao;
 
 public class RegisterRequest
 {
