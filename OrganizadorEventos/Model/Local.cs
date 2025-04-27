@@ -4,7 +4,9 @@ namespace OrganizadorEventos.Model;
 
 public class Local
 {
-    public Guid LocalId { get; set; }
+    public Guid Id { get; set; }
+    [Required] 
+    public Guid UsuarioId { get; set; }
     public string DescricaoLocal { get; set; }
 
     [Required] public string Nome { get; set; }
@@ -21,8 +23,6 @@ public class Local
 
     public bool Ativo { get; set; } = true;
 
-    [Required] 
-    public string UsuarioId { get; set; }
 
-    public ApplicationUser Usuario { get; set; }
+    public Usuario Usuario { get; set; }
 }

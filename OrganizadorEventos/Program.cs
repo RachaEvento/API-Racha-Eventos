@@ -12,6 +12,9 @@ using OrganizadorEventos.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(Environment.GetEnvironmentVariable("POSTGRES_CONNECTION")));
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -52,7 +55,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<Usuario, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -65,11 +68,9 @@ builder.Services.AddScoped<ILocalRepository, LocalRepository>();
 builder.Services.AddScoped<IEventoService, EventoService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IContatoService, ContatoService>();
+builder.Services.AddScoped<ILocalService, LocalService>();
 
 builder.Services.RegisterJWT(builder.Configuration);
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(Environment.GetEnvironmentVariable("POSTGRES_CONNECTION")));
 
 builder.Services.AddControllers();
 
@@ -96,13 +97,13 @@ using (var scope = app.Services.CreateScope())
     var context = services.GetRequiredService<AppDbContext>();
     context.Database.Migrate();
 
-    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<Usuario>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
     await Startup.SeedDefaultUserAsync(userManager, roleManager);
 
     foreach (var role in Enum.GetNames(typeof(UserRole)))
         if (!await roleManager.RoleExistsAsync(role))
-            await roleManager.CreateAsync(new IdentityRole(role));
+            await roleManager.CreateAsync(new IdentityRole<Guid>(role));
 }
 
 app.Run();

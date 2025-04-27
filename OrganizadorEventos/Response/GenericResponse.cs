@@ -7,7 +7,7 @@ public class GenericResponse<T>
     public T? Dados { get; set; }
     public List<string>? Erros { get; set; }
 
-    public static GenericResponse<T> SucessoResponse(T dados, string mensagem = "")
+    public static GenericResponse<T> SucessoResponse(T? dados, string mensagem = "")
     {
         return new GenericResponse<T>
         {

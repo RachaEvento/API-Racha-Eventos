@@ -3,58 +3,56 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
-using OrganizadorEventos.Model;
-using OrganizadorEventos.Request;
+using OrganizadorEventos.Request.Local;
 using OrganizadorEventos.Response;
 
 namespace OrganizadorEventos.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
-public class ContatosController : ControllerBase
+[Route("api/[controller]")]
+public class LocaisController : ControllerBase
 {
-    private readonly IContatoService _contatoService;
+    private readonly ILocalService _localService;
 
-    public ContatosController(IContatoService contatoService)
+    public LocaisController(ILocalService localService)
     {
-        _contatoService = contatoService;
+        _localService = localService;
     }
-
+    
     [HttpGet]
     [Authorize]
-    public async Task<ActionResult<GenericResponse<IEnumerable<ContatoRequest>>>> GetAll()
+    public async Task<ActionResult<GenericResponse<IEnumerable<LocalRequest>>>> GetAll()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
 
-        var contatos = await _contatoService.GetAllByUserAsync(userId);
-        var contatoRequests = contatos.Select(c => c.ToRequest()).ToList();
+        var locais = await _localService.GetAllByUserAsync(userId);
+        var locaisRequests = locais.Select(l => l.ToRequest()).ToList();
 
-        return Ok(GenericResponse<IEnumerable<ContatoRequest>>.SucessoResponse(contatoRequests,"Contatos carregados com sucesso."));
+        return Ok(GenericResponse<IEnumerable<LocalRequest>>.SucessoResponse(locaisRequests,"Locais carregados com sucesso."));
     }
 
     [HttpGet("{id}")]
     [Authorize]
-    public async Task<ActionResult<GenericResponse<ContatoRequest>>> GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
 
-        var contato = await _contatoService.GetByIdAsync(id);
-        if (contato == null || contato.UsuarioId != userId)
-            return NotFound(GenericResponse<string>.ErroResponse(new List<string> { "Contato não encontrado." },
-                "Erro ao buscar contato."));
+        var local = await _localService.GetByIdAsync(id);
+        if (local == null || local.UsuarioId != userId)
+            return NotFound(GenericResponse<string>.ErroResponse(new List<string> { "Local não encontrado." },"Erro ao buscar local."));
 
-        return Ok(GenericResponse<ContatoRequest>.SucessoResponse(contato.ToRequest(), "Contato encontrado."));
+        return Ok(GenericResponse<LocalRequest>.SucessoResponse(local.ToRequest(), "Local encontrado."));
     }
 
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<GenericResponse<ContatoRequest>>> Create([FromBody] ContatoRequest contatoRequest)
+    public async Task<ActionResult<GenericResponse<LocalRequest>>> Create([FromBody] LocalRequest localRequest)
     {
         if (!ModelState.IsValid)
             return BadRequest(GenericResponse<string>.ErroResponse(
@@ -62,22 +60,22 @@ public class ContatosController : ControllerBase
                     "Erro de validação."
                 )
             );
-
+        
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
+        
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
         
         //Cria um novo GUID antes de transformar em entity para garantir que o id seja único.
-        contatoRequest.Id = Guid.NewGuid();
+        localRequest.Id = Guid.NewGuid();
 
-        var contatoCriado = await _contatoService.CreateAsync(contatoRequest.ToEntity(userId));
-        return Ok(GenericResponse<ContatoRequest>.SucessoResponse(contatoCriado.ToRequest(),"Contato criado com sucesso."));
+        var localCriado = await _localService.CreateAsync(localRequest.ToEntity(userId));
+        return Ok(GenericResponse<LocalRequest>.SucessoResponse(localCriado.ToRequest(),"Local criado com sucesso."));
     }
 
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<IActionResult> Update(Guid id, [FromBody] ContatoRequest contatoRequest)
+    public async Task<IActionResult> Update(Guid id, [FromBody] LocalRequest localRequest)
     {
         if (!ModelState.IsValid)
             return BadRequest(GenericResponse<string>.ErroResponse(
@@ -91,16 +89,16 @@ public class ContatosController : ControllerBase
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
 
-        contatoRequest.Id = id;
-        await _contatoService.UpdateAsync(contatoRequest.ToEntity(userId));
-        return Ok(GenericResponse<string>.SucessoResponse("","Contato atualizado com sucesso."));
+        localRequest.Id = id;
+        await _localService.UpdateAsync(localRequest.ToEntity(userId));
+        return Ok(GenericResponse<string>.SucessoResponse("", "Local atualizado com sucesso."));
     }
 
     [HttpDelete("{id}")]
     [Authorize]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _contatoService.DeleteAsync(id);
-        return Ok(GenericResponse<string>.SucessoResponse("", "Contato excluído com sucesso."));
+        await _localService.DeleteAsync(id);
+        return Ok(GenericResponse<string>.SucessoResponse("", "Local excluído com sucesso."));
     }
 }

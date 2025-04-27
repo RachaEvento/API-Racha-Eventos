@@ -6,16 +6,16 @@ using Microsoft.IdentityModel.Tokens;
 using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Model;
-using OrganizadorEventos.Request;
+using OrganizadorEventos.Request.Autenticacao;
 
 namespace OrganizadorEventos.Services;
 
 public class AuthService : IAuthService
 {
     private readonly IConfiguration _configuration;
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly UserManager<Usuario> _userManager;
 
-    public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+    public AuthService(UserManager<Usuario> userManager, IConfiguration configuration)
     {
         _userManager = userManager;
         _configuration = configuration;
@@ -44,7 +44,7 @@ public class AuthService : IAuthService
         if (existingUser != null)
             throw new ArgumentException("Já existe um usuário com este email.");
 
-        var user = new ApplicationUser
+        var user = new Usuario
         {
             UserName = registerRequest.Nome,
             Email = registerRequest.Email,
@@ -66,14 +66,15 @@ public class AuthService : IAuthService
     }
 
     // Método que gera o token JWT
-    private string GenerateJwtToken(ApplicationUser usuario, IList<string> roles)
+    private string GenerateJwtToken(Usuario usuario, IList<string> roles)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, usuario.Id),
+            new(JwtRegisteredClaimNames.Name, usuario.UserName),
+            new(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, usuario.Email),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };

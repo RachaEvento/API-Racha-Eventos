@@ -1,44 +1,42 @@
 using OrganizadorEventos.Model;
-using OrganizadorEventos.Request;
+using OrganizadorEventos.Request.Local;
 
 namespace OrganizadorEventos.Mappers;
 
 public static class LocalMapper
 {
-    public static LocalRequest ToLocalRequest(Local local)
+    public static LocalRequest ToRequest(this Local entity)
     {
         return new LocalRequest
         {
-            LocalId = local.LocalId,
-            DescricaoLocal = local.DescricaoLocal,
-            Nome = local.Nome,
-            Endereco = local.Endereco,
-            Bairro = local.Bairro,
-            Cidade = local.Cidade,
-            Estado = local.Estado,
-            Ativo = local.Ativo,
-            UsuarioId = local.UsuarioId
+            Id = entity.Id,
+            DescricaoLocal = entity.DescricaoLocal,
+            Nome = entity.Nome,
+            Endereco = entity.Endereco,
+            Bairro = entity.Bairro,
+            Cidade = entity.Cidade,
+            Estado = entity.Estado,
+            Ativo = entity.Ativo
         };
     }
 
-    // Mapeia de LocalRequest para Local
-    public static Local ToLocalEntity(LocalRequest localRequest)
+    public static Local ToEntity(this LocalRequest request, Guid usuarioId)
     {
         return new Local
         {
-            LocalId = localRequest.LocalId,
-            DescricaoLocal = localRequest.DescricaoLocal,
-            Nome = localRequest.Nome,
-            Endereco = localRequest.Endereco,
-            Bairro = localRequest.Bairro,
-            Cidade = localRequest.Cidade,
-            Estado = localRequest.Estado,
-            Ativo = localRequest.Ativo,
-            UsuarioId = localRequest.UsuarioId
+            Id = request.Id ?? Guid.NewGuid(),
+            DescricaoLocal = request.DescricaoLocal,
+            Nome = request.Nome,
+            Endereco = request.Endereco,
+            Bairro = request.Bairro,
+            Cidade = request.Cidade,
+            Estado = request.Estado,
+            Ativo = request.Ativo,
+            UsuarioId =  usuarioId
         };
     }
 
-    public static void UpdateLocalEntity(Local entity, LocalRequest request)
+    public static void UpdateWithRequest(this Local entity, LocalRequest request)
     {
         entity.DescricaoLocal = request.DescricaoLocal;
         entity.Nome = request.Nome;
@@ -47,6 +45,5 @@ public static class LocalMapper
         entity.Cidade = request.Cidade;
         entity.Estado = request.Estado;
         entity.Ativo = request.Ativo;
-        entity.UsuarioId = request.UsuarioId;
     }
 }

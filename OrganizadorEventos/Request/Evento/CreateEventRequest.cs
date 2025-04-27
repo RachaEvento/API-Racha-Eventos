@@ -1,4 +1,4 @@
-namespace OrganizadorEventos.Request;
+namespace OrganizadorEventos.Request.Evento;
 
 public class CreateEventRequest
 {

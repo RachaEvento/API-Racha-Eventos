@@ -13,7 +13,7 @@ public class ContatoService : CrudService<Contato>, IContatoService
         _contatoRepository = contatoRepository;
     }
 
-    public Task<List<Contato>> GetAllByUserAsync(string userId)
+    public Task<List<Contato>> GetAllByUserAsync(Guid userId)
     {
         return _contatoRepository.GetAllByUserAsync(userId);
     }

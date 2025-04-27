@@ -9,8 +9,8 @@ namespace OrganizadorEventos;
 
 public static class Startup
 {
-    public static async Task SeedDefaultUserAsync(UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager)
+    public static async Task SeedDefaultUserAsync(UserManager<Usuario> userManager,
+        RoleManager<IdentityRole<Guid>> roleManager)
     {
         var baseUserName = "User";
         var baseUserEmail = "user@mail.com";
@@ -18,7 +18,7 @@ public static class Startup
 
         if (await userManager.FindByEmailAsync(baseUserEmail) == null)
         {
-            var baseUser = new ApplicationUser
+            var baseUser = new Usuario
             {
                 UserName = baseUserName,
                 Email = baseUserEmail,
@@ -29,7 +29,7 @@ public static class Startup
             if (result.Succeeded)
             {
                 if (!await roleManager.RoleExistsAsync("Usuario"))
-                    await roleManager.CreateAsync(new IdentityRole("Usuario"));
+                    await roleManager.CreateAsync(new IdentityRole<Guid>("Usuario"));
 
                 await userManager.AddToRoleAsync(baseUser, "Usuario");
             }

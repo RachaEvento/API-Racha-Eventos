@@ -10,8 +10,7 @@ public class EventoService : CrudService<Evento>, IEventoService
     private readonly IEventoRepository _eventoRepository;
     private readonly ILocalRepository _localRepository;
 
-    public EventoService(IEventoRepository eventoRepository, IContatoRepository contatoRepository,
-        ILocalRepository localRepository) : base(eventoRepository)
+    public EventoService(IEventoRepository eventoRepository, IContatoRepository contatoRepository, ILocalRepository localRepository) : base(eventoRepository)
     {
         _eventoRepository = eventoRepository;
         _contatoRepository = contatoRepository;

@@ -8,7 +8,7 @@ public class Contato
     {
     }
 
-    public Contato(ContatoRequest request, string usuarioId)
+    public Contato(ContatoRequest request, Guid usuarioId)
     {
         Id = Guid.NewGuid();
         UsuarioId = usuarioId;
@@ -18,7 +18,7 @@ public class Contato
         Ativo = request.Ativo;
     }
 
-    public Contato(ContatoRequest request, string usuarioId, Guid id)
+    public Contato(ContatoRequest request, Guid usuarioId, Guid id)
     {
         Id = id;
         UsuarioId = usuarioId;
@@ -29,12 +29,12 @@ public class Contato
     }
 
     public Guid Id { get; set; }
-    public string UsuarioId { get; set; }
+    public Guid UsuarioId { get; set; }
     public string Nome { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string Telefone { get; set; } = null!;
     public bool Ativo { get; set; }
 
-    public ApplicationUser Usuario { get; set; } = null!;
+    public Usuario Usuario { get; set; } = null!;
     public ICollection<Participante> Participantes { get; set; } = new List<Participante>();
 }

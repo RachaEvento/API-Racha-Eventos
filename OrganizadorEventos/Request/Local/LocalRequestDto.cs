@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OrganizadorEventos.Request;
+namespace OrganizadorEventos.Request.Local;
 
 public class LocalRequest
 {
-    public Guid LocalId { get; set; }
+    public Guid? Id { get; set; }
 
     [Required] public string Nome { get; set; }
 
@@ -19,8 +19,5 @@ public class LocalRequest
     [Required]
     [StringLength(2, MinimumLength = 2, ErrorMessage = "Estado deve ter 2 letras.")]
     public string Estado { get; set; }
-
     public bool Ativo { get; set; } = true;
-
-    [Required] public string UsuarioId { get; set; }
 }
