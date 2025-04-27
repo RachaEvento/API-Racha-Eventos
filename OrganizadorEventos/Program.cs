@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using OrganizadorEventos;
@@ -8,6 +9,7 @@ using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Model;
 using OrganizadorEventos.Repository;
+using OrganizadorEventos.Response;
 using OrganizadorEventos.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -72,7 +74,24 @@ builder.Services.AddScoped<ILocalService, LocalService>();
 
 builder.Services.RegisterJWT(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Values
+            .SelectMany(v => v.Errors)
+            .Select(e => e.ErrorMessage)
+            .ToList();
+
+        var customResponse = GenericResponse<string>.ErroResponse(
+            errors,
+            "Erro de validação."
+        );
+
+        return new BadRequestObjectResult(customResponse);
+    };
+});
 
 var app = builder.Build();
 
