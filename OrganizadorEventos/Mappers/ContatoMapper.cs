@@ -5,9 +5,9 @@ namespace OrganizadorEventos.Mappers;
 
 public static class ContatoMapper
 {
-    public static ContatoRequest ToRequest(this Contato entity)
+    public static ContatoDTO ToRequest(this Contato entity)
     {
-        return new ContatoRequest
+        return new ContatoDTO
         {
             Id = entity.Id,
             Nome = entity.Nome,
@@ -17,24 +17,16 @@ public static class ContatoMapper
         };
     }
 
-    public static Contato ToEntity(this ContatoRequest request, Guid usuarioId)
+    public static Contato ToEntity(this ContatoDTO dto, Guid usuarioId)
     {
         return new Contato
         {
-            Id = request.Id ?? Guid.NewGuid(),
-            Nome = request.Nome,
-            Email = request.Email,
-            Telefone = request.Telefone,
-            Ativo = request.Ativo,
+            Id = dto.Id ?? Guid.NewGuid(),
+            Nome = dto.Nome,
+            Email = dto.Email,
+            Telefone = dto.Telefone,
+            Ativo = dto.Ativo,
             UsuarioId =  usuarioId
         };
-    }
-
-    public static void UpdateWithRequest(this Contato entity, ContatoRequest request)
-    {
-        entity.Nome = request.Nome;
-        entity.Email = request.Email;
-        entity.Telefone = request.Telefone;
-        entity.Ativo = request.Ativo;
     }
 }

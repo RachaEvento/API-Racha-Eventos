@@ -65,6 +65,7 @@ builder.Services.AddIdentity<Usuario, IdentityRole<Guid>>()
 builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 builder.Services.AddScoped<IContatoRepository, ContatoRepository>();
 builder.Services.AddScoped<ILocalRepository, LocalRepository>();
+builder.Services.AddScoped<IParticipanteRepository, ParticipanteRepository>();
 
 //Services
 builder.Services.AddScoped<IEventoService, EventoService>();

@@ -35,15 +35,4 @@ public static class LocalMapper
             UsuarioId =  usuarioId
         };
     }
-
-    public static void UpdateWithRequest(this Local entity, LocalRequest request)
-    {
-        entity.DescricaoLocal = request.DescricaoLocal;
-        entity.Nome = request.Nome;
-        entity.Endereco = request.Endereco;
-        entity.Bairro = request.Bairro;
-        entity.Cidade = request.Cidade;
-        entity.Estado = request.Estado;
-        entity.Ativo = request.Ativo;
-    }
 }

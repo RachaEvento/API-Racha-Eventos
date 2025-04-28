@@ -2,7 +2,7 @@ using OrganizadorEventos.Model;
 
 namespace OrganizadorEventos.Request;
 
-public class ContatoRequest
+public class ContatoDTO
 {
     public Guid? Id { get; set; }
     public string Nome { get; set; } = null!;
