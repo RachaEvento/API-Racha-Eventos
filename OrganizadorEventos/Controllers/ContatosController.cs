@@ -22,7 +22,7 @@ public class ContatosController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    public async Task<ActionResult<GenericResponse<IEnumerable<ContatoRequest>>>> GetAll()
+    public async Task<ActionResult<GenericResponse<IEnumerable<ContatoDTO>>>> GetAll()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -32,12 +32,12 @@ public class ContatosController : ControllerBase
         var contatos = await _contatoService.GetAllByUserAsync(userId);
         var contatoRequests = contatos.Select(c => c.ToRequest()).ToList();
 
-        return Ok(GenericResponse<IEnumerable<ContatoRequest>>.SucessoResponse(contatoRequests,"Contatos carregados com sucesso."));
+        return Ok(GenericResponse<IEnumerable<ContatoDTO>>.SucessoResponse(contatoRequests,"Contatos carregados com sucesso."));
     }
 
     [HttpGet("{id}")]
     [Authorize]
-    public async Task<ActionResult<GenericResponse<ContatoRequest>>> GetById(Guid id)
+    public async Task<ActionResult<GenericResponse<ContatoDTO>>> GetById(Guid id)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -49,12 +49,12 @@ public class ContatosController : ControllerBase
             return NotFound(GenericResponse<string>.ErroResponse(new List<string> { "Contato não encontrado." },
                 "Erro ao buscar contato."));
 
-        return Ok(GenericResponse<ContatoRequest>.SucessoResponse(contato.ToRequest(), "Contato encontrado."));
+        return Ok(GenericResponse<ContatoDTO>.SucessoResponse(contato.ToRequest(), "Contato encontrado."));
     }
 
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<GenericResponse<ContatoRequest>>> Create([FromBody] ContatoRequest contatoRequest)
+    public async Task<ActionResult<GenericResponse<ContatoDTO>>> Create([FromBody] ContatoDTO contatoDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(GenericResponse<string>.ErroResponse(
@@ -69,15 +69,15 @@ public class ContatosController : ControllerBase
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
         
         //Cria um novo GUID antes de transformar em entity para garantir que o id seja único.
-        contatoRequest.Id = Guid.NewGuid();
+        contatoDto.Id = Guid.NewGuid();
 
-        var contatoCriado = await _contatoService.CreateAsync(contatoRequest.ToEntity(userId));
-        return Ok(GenericResponse<ContatoRequest>.SucessoResponse(contatoCriado.ToRequest(),"Contato criado com sucesso."));
+        var contatoCriado = await _contatoService.CreateAsync(contatoDto.ToEntity(userId));
+        return Ok(GenericResponse<ContatoDTO>.SucessoResponse(contatoCriado.ToRequest(),"Contato criado com sucesso."));
     }
 
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<IActionResult> Update(Guid id, [FromBody] ContatoRequest contatoRequest)
+    public async Task<IActionResult> Update(Guid id, [FromBody] ContatoDTO contatoDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(GenericResponse<string>.ErroResponse(
@@ -91,8 +91,8 @@ public class ContatosController : ControllerBase
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
 
-        contatoRequest.Id = id;
-        await _contatoService.UpdateAsync(contatoRequest.ToEntity(userId));
+        contatoDto.Id = id;
+        await _contatoService.UpdateAsync(contatoDto.ToEntity(userId));
         return Ok(GenericResponse<string>.SucessoResponse("","Contato atualizado com sucesso."));
     }
 

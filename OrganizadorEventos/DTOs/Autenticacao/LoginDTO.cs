@@ -1,6 +1,6 @@
 namespace OrganizadorEventos.Request.Autenticacao;
 
-public class LoginRequest
+public class LoginDTO
 {
     public string Email { get; set; }
     public string Password { get; set; }

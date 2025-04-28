@@ -17,15 +17,15 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
+    public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
     {
-        if (loginRequest == null)
+        if (loginDto == null)
             return BadRequest(
                 GenericResponse<string>.ErroResponse(new List<string> { "Dados de login não fornecidos." }));
 
         try
         {
-            var token = await _authService.LoginAsync(loginRequest);
+            var token = await _authService.LoginAsync(loginDto);
             return Ok(GenericResponse<string>.SucessoResponse(token, "Login realizado com sucesso."));
         }
         catch (ArgumentException ex)
@@ -36,15 +36,15 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterUser([FromBody] RegisterRequest registerRequest)
+    public async Task<IActionResult> RegisterUser([FromBody] RegisterDTO registerDto)
     {
-        if (registerRequest == null)
+        if (registerDto == null)
             return BadRequest(GenericResponse<string>.ErroResponse(new List<string>
                 { "Dados do usuário não fornecidos." }));
 
         try
         {
-            var token = await _authService.RegisterAsync(registerRequest);
+            var token = await _authService.RegisterAsync(registerDto);
             return Ok(GenericResponse<string>.SucessoResponse(token, "Usuário registrado com sucesso."));
         }
         catch (ArgumentException ex)

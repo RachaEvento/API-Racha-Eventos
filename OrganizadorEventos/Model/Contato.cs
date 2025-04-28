@@ -8,24 +8,24 @@ public class Contato
     {
     }
 
-    public Contato(ContatoRequest request, Guid usuarioId)
+    public Contato(ContatoDTO dto, Guid usuarioId)
     {
         Id = Guid.NewGuid();
         UsuarioId = usuarioId;
-        Nome = request.Nome;
-        Email = request.Email;
-        Telefone = request.Telefone;
-        Ativo = request.Ativo;
+        Nome = dto.Nome;
+        Email = dto.Email;
+        Telefone = dto.Telefone;
+        Ativo = dto.Ativo;
     }
 
-    public Contato(ContatoRequest request, Guid usuarioId, Guid id)
+    public Contato(ContatoDTO dto, Guid usuarioId, Guid id)
     {
         Id = id;
         UsuarioId = usuarioId;
-        Nome = request.Nome;
-        Email = request.Email;
-        Telefone = request.Telefone;
-        Ativo = request.Ativo;
+        Nome = dto.Nome;
+        Email = dto.Email;
+        Telefone = dto.Telefone;
+        Ativo = dto.Ativo;
     }
 
     public Guid Id { get; set; }

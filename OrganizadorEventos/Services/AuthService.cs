@@ -21,13 +21,13 @@ public class AuthService : IAuthService
         _configuration = configuration;
     }
 
-    public async Task<string> LoginAsync(LoginRequest loginRequest)
+    public async Task<string> LoginAsync(LoginDTO loginDto)
     {
-        var user = await _userManager.FindByEmailAsync(loginRequest.Email);
+        var user = await _userManager.FindByEmailAsync(loginDto.Email);
         if (user == null)
             throw new ArgumentException("Usuário não encontrado.");
 
-        var result = await _userManager.CheckPasswordAsync(user, loginRequest.Password);
+        var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
         //Mesmo verificando apenas a senha eu informo que ambos estão errados.
         if (!result)
@@ -38,20 +38,20 @@ public class AuthService : IAuthService
         return GenerateJwtToken(user, roles);
     }
 
-    public async Task<string> RegisterAsync(RegisterRequest registerRequest)
+    public async Task<string> RegisterAsync(RegisterDTO registerDto)
     {
-        var existingUser = await _userManager.FindByEmailAsync(registerRequest.Email);
+        var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
         if (existingUser != null)
             throw new ArgumentException("Já existe um usuário com este email.");
 
         var user = new Usuario
         {
-            UserName = registerRequest.Nome,
-            Email = registerRequest.Email,
-            PhoneNumber = registerRequest.Numero
+            UserName = registerDto.Nome,
+            Email = registerDto.Email,
+            PhoneNumber = registerDto.Numero
         };
 
-        var result = await _userManager.CreateAsync(user, registerRequest.Password);
+        var result = await _userManager.CreateAsync(user, registerDto.Password);
 
         if (!result.Succeeded)
         {
