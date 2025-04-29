@@ -1,7 +1,6 @@
 ﻿using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
-using OrganizadorEventos.Model;
 using OrganizadorEventos.Request;
 
 namespace OrganizadorEventos.Services;

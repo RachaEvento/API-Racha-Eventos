@@ -13,7 +13,7 @@ public static class ContatoMapper
             Nome = entity.Nome,
             Email = entity.Email,
             Telefone = entity.Telefone,
-            Ativo = entity.Ativo,
+            Ativo = entity.Ativo
         };
     }
 
@@ -26,7 +26,7 @@ public static class ContatoMapper
             Email = dto.Email,
             Telefone = dto.Telefone,
             Ativo = dto.Ativo,
-            UsuarioId =  usuarioId
+            UsuarioId = usuarioId
         };
     }
 }

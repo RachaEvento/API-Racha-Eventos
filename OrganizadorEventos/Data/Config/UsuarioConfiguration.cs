@@ -10,5 +10,4 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
     {
         //builder.HasKey(u => u.Id);  
     }
-    
 }

@@ -1,9 +1,8 @@
 ﻿using OrganizadorEventos.Model;
 
-namespace OrganizadorEventos.Interfaces.Services
+namespace OrganizadorEventos.Interfaces.Services;
+
+public interface ILocalService : ICrudService<Local>
 {
-    public interface ILocalService : ICrudService<Local>
-    {
-        Task<List<Local>> GetAllByUserAsync(Guid userId);
-    }
+    Task<List<Local>> GetAllByUserAsync(Guid userId);
 }

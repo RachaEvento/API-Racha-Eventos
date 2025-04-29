@@ -6,12 +6,12 @@ using OrganizadorEventos.Model;
 
 namespace OrganizadorEventos.Repository;
 
-public class ParticipanteRepository : CrudRepository<Participante>,  IParticipanteRepository
+public class ParticipanteRepository : CrudRepository<Participante>, IParticipanteRepository
 {
     private readonly AppDbContext _context;
     protected readonly DbSet<Participante> _dbSet;
 
-    public ParticipanteRepository(AppDbContext context): base(context)
+    public ParticipanteRepository(AppDbContext context) : base(context)
     {
         _context = context;
         _dbSet = context.Set<Participante>();
@@ -20,13 +20,13 @@ public class ParticipanteRepository : CrudRepository<Participante>,  IParticipan
     public async Task<List<Participante>> CreateAllFromContactsAsync(List<Guid> contatosParticipantes, Guid eventoId)
     {
         var participantes = new List<Participante>();
-        
+
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
             foreach (var contatoId in contatosParticipantes)
             {
-                var participante = new Participante()
+                var participante = new Participante
                 {
                     Id = Guid.NewGuid(),
                     EventoId = eventoId,
@@ -35,7 +35,7 @@ public class ParticipanteRepository : CrudRepository<Participante>,  IParticipan
                 };
                 participantes.Add(participante);
             }
-            
+
             await _dbSet.AddRangeAsync(participantes);
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -54,7 +54,7 @@ public class ParticipanteRepository : CrudRepository<Participante>,  IParticipan
             .Where(p => p.EventoId == eventoId && contatosParticipantes.Contains(p.ContatoId))
             .Include(p => p.Contato) // Eager load Contato
             .ToListAsync();
-        
+
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
@@ -65,7 +65,7 @@ public class ParticipanteRepository : CrudRepository<Participante>,  IParticipan
                 var participanteListaCustos = await _context.Set<ParticipanteListaCusto>()
                     .Where(plc => participanteIds.Contains(plc.ParticipanteId))
                     .ToListAsync();
-                
+
                 //Ideal seria converter isso posteriormente no repo de lista de custo
                 _context.Set<ParticipanteListaCusto>().RemoveRange(participanteListaCustos);
 
@@ -85,8 +85,8 @@ public class ParticipanteRepository : CrudRepository<Participante>,  IParticipan
     public async Task<List<Participante>> GetAllByEventId(Guid eventoId)
     {
         return await _dbSet
-        .Where(p => p.EventoId == eventoId)
-        .Include(p => p.Contato) // Eager load Contato
-        .ToListAsync();
+            .Where(p => p.EventoId == eventoId)
+            .Include(p => p.Contato) // Eager load Contato
+            .ToListAsync();
     }
 }

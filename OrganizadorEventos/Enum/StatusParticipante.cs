@@ -5,5 +5,5 @@ public enum StatusParticipante
     Recusado,
     Pendente,
     Confirmado,
-    Pago,
+    Pago
 }
