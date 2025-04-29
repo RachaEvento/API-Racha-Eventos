@@ -35,4 +35,12 @@ public class ListaCustoRepository : IListaCustoRepository
             .Include(l => l.Custos)
             .FirstOrDefaultAsync(l => l.Id == id);
     }
+    public async Task<List<ListaCusto>> ObterTodosComCustosAsync(Guid eventoId)
+    {
+        return await _context.ListaCustos
+            .Where(l => l.EventoId == eventoId) 
+            .Include(l => l.Custos)
+            .ToListAsync();
+    }
+
 }

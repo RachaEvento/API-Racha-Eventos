@@ -3,6 +3,7 @@ using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
 using OrganizadorEventos.Model;
+using OrganizadorEventos.Request.Evento;
 using OrganizadorEventos.Response;
 
 namespace OrganizadorEventos.Services;
@@ -32,11 +33,27 @@ public class ListaCustoService : IListaCustoService
 
         return GenericResponse<string>.SucessoResponse("Lista de custo criada com sucesso.");
     }
-
-
+    
     public async Task<List<ListaCustoResponseDTO>> ListarListasDeCustoPorEventoAsync(Guid eventoId)
     {
         var listasCusto = await _listaCustoRepository.GetAllByEventoIdAsync(eventoId);
         return listasCusto.ToResponse();
     }
+    public async Task<List<EventoComCustosDto>> ListarEventosComCustosAsync(Guid eventoId)
+    {
+        var eventos = await _listaCustoRepository.ObterTodosComCustosAsync(eventoId);
+
+        return eventos.Select(e => new EventoComCustosDto
+        {
+            Id = e.Id,
+            Nome = e.Nome,
+            Custo = e.Custos.Select(c => new CustoDto
+            {
+                Id = c.Id,
+                Nome = c.Nome,
+                Valor = c.Valor
+            }).ToList()
+        }).ToList();
+    }
+
 }

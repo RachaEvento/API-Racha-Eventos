@@ -49,5 +49,28 @@ namespace OrganizadorEventos.Controllers
             await _participanteListaCustoService.RemoverParticipantesAsync(dto);
             return Ok(GenericResponse<string>.SucessoResponse(null, "Participantes removidos com sucesso."));
         }
+        
+        [HttpGet("eventos-com-custos")]
+        public async Task<IActionResult> GetEventosComCustos(Guid eventoId)
+        {
+            try
+            {
+                var eventos = await _listaCustoService.ListarEventosComCustosAsync(eventoId);
+
+                return Ok(new {
+                    sucesso = true,
+                    mensagem = "",
+                    dados = eventos
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new {
+                    sucesso = false,
+                    mensagem = $"Erro ao obter eventos: {ex.Message}"
+                });
+            }
+        }
+
     }
 }
