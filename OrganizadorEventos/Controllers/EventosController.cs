@@ -70,40 +70,4 @@ public class EventosController : ControllerBase
         await _eventoService.UpdateAsync(dto, id);
         return Ok(GenericResponse<string>.SucessoResponse("","Evento atualizado com sucesso."));
     }
-    
-    [HttpGet("{id}/participantes")]
-    [Authorize]
-    public async Task<IActionResult> ListParticipants(Guid id)
-    {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdClaim, out var userId))
-            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-        
-        var participantes = await _eventoService.ListarParticipantes(id);
-        return Ok(GenericResponse<List<ContatoDTO>>.SucessoResponse(participantes,"Participantes recuperados com sucesso."));
-    }
-    
-    [HttpPut("{id}/participantes/adicionar")]
-    [Authorize]
-    public async Task<IActionResult> AddParticipants(Guid id, [FromBody] List<Guid> participantes)
-    {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdClaim, out var userId))
-            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-        
-        await _eventoService.AdicionarParticipantesAsync(participantes, id);
-        return Ok(GenericResponse<string>.SucessoResponse("","Participantes adicionados com sucesso."));
-    }
-    
-    [HttpPut("{id}/participantes/remover")]
-    [Authorize]
-    public async Task<IActionResult> RemoveParticipants(Guid id, [FromBody] List<Guid> participantes)
-    {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdClaim, out var userId))
-            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-        
-        await _eventoService.RemoverParticipantesAsync(participantes, id);
-        return Ok(GenericResponse<string>.SucessoResponse("","Participantes removidos com sucesso."));
-    }
 }
