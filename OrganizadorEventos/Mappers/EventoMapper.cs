@@ -24,7 +24,7 @@ public static class EventoMapper
             LocalEstado = entity.LocalEstado
         };
     }
-    
+
     public static Evento ToEntity(this CriarEventoDTO dto, Guid usuarioId)
     {
         return new Evento

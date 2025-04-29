@@ -32,7 +32,7 @@ public static class LocalMapper
             Cidade = request.Cidade,
             Estado = request.Estado,
             Ativo = request.Ativo,
-            UsuarioId =  usuarioId
+            UsuarioId = usuarioId
         };
     }
 }

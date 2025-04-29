@@ -3,7 +3,7 @@ version: "3.8"
 services:
   organizadoreventos:
     build:
-      context: "C:\\Users\\migue\\Documentos\\GitHub\\API-Racha-Eventos"
+      context: "/home/diogowebber/Documentos/GitHub/RachaEventos/API-Racha-Eventos"
       dockerfile: "OrganizadorEventos/Dockerfile"
       target: "base"
     command: []
@@ -16,7 +16,7 @@ services:
     image: "organizadoreventos:dev"
     ports: []
     volumes:
-    - "C:\\Users\\migue\\Documentos\\GitHub\\API-Racha-Eventos\\OrganizadorEventos:/app:rw"
-    - "C:\\Users\\migue\\Documentos\\GitHub\\API-Racha-Eventos:/src:rw"
-    - "C:\\Users\\migue\\.nuget\\packages:/root/.nuget/packages"
+    - "/home/diogowebber/Documentos/GitHub/RachaEventos/API-Racha-Eventos/OrganizadorEventos:/app:rw"
+    - "/home/diogowebber/Documentos/GitHub/RachaEventos/API-Racha-Eventos:/src:rw"
+    - "/home/diogowebber/.nuget/packages:/root/.nuget/packages"
     working_dir: "/app"
