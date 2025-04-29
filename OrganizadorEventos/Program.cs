@@ -72,6 +72,7 @@ builder.Services.AddScoped<IEventoService, EventoService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IContatoService, ContatoService>();
 builder.Services.AddScoped<ILocalService, LocalService>();
+builder.Services.AddScoped<IParticipanteService, ParticipanteService>();
 
 builder.Services.RegisterJWT(builder.Configuration);
 
