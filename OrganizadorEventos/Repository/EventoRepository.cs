@@ -30,7 +30,11 @@ public class EventoRepository : IEventoRepository
 
     public async Task<Evento> GetByIdAsync(Guid eventoId)
     {
-        return await _dbSet.FindAsync(eventoId);
+        return await _dbSet
+            .Include(e => e.Usuario)
+            .Include(e => e.Participantes)
+            .ThenInclude(p => p.Contato)
+            .FirstOrDefaultAsync(e => e.Id == eventoId);
     }
 
     public async Task UpdateAsync(Evento entity)

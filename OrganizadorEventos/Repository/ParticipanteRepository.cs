@@ -51,7 +51,7 @@ public class ParticipanteRepository : CrudRepository<Participante>, IParticipant
     public async Task RemoveParticipantsAsync(List<Guid> contatosParticipantes, Guid eventoId)
     {
         var participantes = await _dbSet
-            .Where(p => p.EventoId == eventoId && contatosParticipantes.Contains(p.ContatoId))
+            .Where(p => p.EventoId == eventoId && contatosParticipantes.Contains(p.Id))
             .Include(p => p.Contato) // Eager load Contato
             .ToListAsync();
 
@@ -88,5 +88,14 @@ public class ParticipanteRepository : CrudRepository<Participante>, IParticipant
             .Where(p => p.EventoId == eventoId)
             .Include(p => p.Contato) // Eager load Contato
             .ToListAsync();
+    }
+    
+    public async Task<Participante> GetByIdAsync(Guid id)
+    {
+        return await _dbSet
+            .Include(p => p.Contato)
+            .ThenInclude(c => c.Usuario)
+            .Include(p => p.Evento)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 }

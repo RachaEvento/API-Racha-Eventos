@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OrganizadorEventos.DTOs.Email;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Request;
 using OrganizadorEventos.Response;
@@ -17,8 +18,8 @@ public class ParticipantesController : ControllerBase
     {
         _participanteService = participanteService;
     }
-
-    [HttpGet("{EventoId}")]
+    
+    [HttpGet("evento/{EventoId}")]
     [Authorize]
     public async Task<IActionResult> ListParticipants(Guid EventoId)
     {
@@ -30,20 +31,30 @@ public class ParticipantesController : ControllerBase
         return Ok(GenericResponse<List<ContatoDTO>>.SucessoResponse(participantes,
             "Participantes recuperados com sucesso."));
     }
-
-    [HttpPost("{EventoId}/adicionar")]
+    
+    /// <summary>
+    /// Adiciona participantes a um evento.
+    /// </summary>
+    /// <param name="EventoId">ID do evento.</param>
+    /// <param name="contatos">Lista de IDs dos contatos a serem adicionados.</param>
+    [HttpPost("evento/{EventoId}/adicionar")]
     [Authorize]
-    public async Task<IActionResult> AddParticipants(Guid EventoId, [FromBody] List<Guid> participantes)
+    public async Task<IActionResult> AddParticipants(Guid EventoId, [FromBody] List<Guid> contatos)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-
-        await _participanteService.AdicionarParticipantesAsync(participantes, EventoId);
-        return Ok(GenericResponse<string>.SucessoResponse("", "Participantes adicionados com sucesso."));
+        
+        await _participanteService.AdicionarContatosComoParticipantesAsync(contatos, EventoId);
+        return Ok(GenericResponse<string>.SucessoResponse("","Participantes adicionados com sucesso."));
     }
-
-    [HttpPost("{EventoId}/remover")]
+    
+    /// <summary>
+    /// Remove participantes a um evento.
+    /// </summary>
+    /// <param name="EventoId">ID do evento.</param>
+    /// <param name="participantes">Lista de IDs dos participantes a serem removidos.</param>
+    [HttpPost("evento/{EventoId}/remover")]
     [Authorize]
     public async Task<IActionResult> RemoveParticipants(Guid EventoId, [FromBody] List<Guid> participantes)
     {
@@ -53,5 +64,29 @@ public class ParticipantesController : ControllerBase
 
         await _participanteService.RemoverParticipantesAsync(participantes, EventoId);
         return Ok(GenericResponse<string>.SucessoResponse("", "Participantes removidos com sucesso."));
+    }
+    
+    [HttpPost("evento/{EventoId}/convidar/todos")]
+    [Authorize]
+    public async Task<IActionResult> ConvidarParticipantesEvento(Guid EventoId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
+
+        await _participanteService.ConvidarTodosParticipantesEvento(EventoId);
+        return Ok(GenericResponse<string>.SucessoResponse("","Emails encaminhados"));
+    }
+    
+    [HttpPost("evento/{EventoId}/convidar/{ParticipanteId}")]
+    [Authorize]
+    public async Task<IActionResult> ConvidarParticipanteEvento(Guid EventoId, Guid ParticipanteId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
+
+        await _participanteService.ConvidarParticipante(ParticipanteId);
+        return Ok(GenericResponse<string>.SucessoResponse("","Email encaminhados"));
     }
 }
