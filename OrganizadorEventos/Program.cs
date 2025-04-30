@@ -66,6 +66,7 @@ builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 builder.Services.AddScoped<IContatoRepository, ContatoRepository>();
 builder.Services.AddScoped<ILocalRepository, LocalRepository>();
 builder.Services.AddScoped<IParticipanteRepository, ParticipanteRepository>();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 //Services
 builder.Services.AddScoped<IEventoService, EventoService>();
@@ -73,6 +74,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IContatoService, ContatoService>();
 builder.Services.AddScoped<ILocalService, LocalService>();
 builder.Services.AddScoped<IParticipanteService, ParticipanteService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.RegisterJWT(builder.Configuration);
 
