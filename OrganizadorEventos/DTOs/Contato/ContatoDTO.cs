@@ -1,5 +1,3 @@
-using OrganizadorEventos.Model;
-
 namespace OrganizadorEventos.Request;
 
 public class ContatoDTO

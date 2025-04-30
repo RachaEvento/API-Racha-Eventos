@@ -5,8 +5,9 @@ namespace OrganizadorEventos.Model;
 public class Local
 {
     public Guid Id { get; set; }
-    [Required] 
-    public Guid UsuarioId { get; set; }
+
+    [Required] public Guid UsuarioId { get; set; }
+
     public string DescricaoLocal { get; set; }
 
     [Required] public string Nome { get; set; }

@@ -1,10 +1,8 @@
-﻿using OrganizadorEventos.Enum;
-
-namespace OrganizadorEventos.Request.Evento;
+﻿namespace OrganizadorEventos.Request.Evento;
 
 public class EditarEventoDTO
 {
-    public string  Nome { get; set; } = null!;
+    public string Nome { get; set; } = null!;
     public string? Descricao { get; set; }
     public DateTime DataInicio { get; set; }
     public DateTime? DataFinal { get; set; }

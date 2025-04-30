@@ -1,5 +1,4 @@
-﻿using OrganizadorEventos.Model;
-using OrganizadorEventos.Request;
+﻿using OrganizadorEventos.Request;
 
 namespace OrganizadorEventos.Interfaces.Services;
 

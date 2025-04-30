@@ -19,5 +19,6 @@ public class LocalRequest
     [Required]
     [StringLength(2, MinimumLength = 2, ErrorMessage = "Estado deve ter 2 letras.")]
     public string Estado { get; set; }
+
     public bool Ativo { get; set; } = true;
 }

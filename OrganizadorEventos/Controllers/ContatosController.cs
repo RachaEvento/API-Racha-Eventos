@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
-using OrganizadorEventos.Model;
 using OrganizadorEventos.Request;
 using OrganizadorEventos.Response;
 
@@ -32,7 +31,8 @@ public class ContatosController : ControllerBase
         var contatos = await _contatoService.GetAllByUserAsync(userId);
         var contatoRequests = contatos.Select(c => c.ToRequest()).ToList();
 
-        return Ok(GenericResponse<IEnumerable<ContatoDTO>>.SucessoResponse(contatoRequests,"Contatos carregados com sucesso."));
+        return Ok(GenericResponse<IEnumerable<ContatoDTO>>.SucessoResponse(contatoRequests,
+            "Contatos carregados com sucesso."));
     }
 
     [HttpGet("{id}")]
@@ -67,12 +67,13 @@ public class ContatosController : ControllerBase
 
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-        
+
         //Cria um novo GUID antes de transformar em entity para garantir que o id seja único.
         contatoDto.Id = Guid.NewGuid();
 
         var contatoCriado = await _contatoService.CreateAsync(contatoDto.ToEntity(userId));
-        return Ok(GenericResponse<ContatoDTO>.SucessoResponse(contatoCriado.ToRequest(),"Contato criado com sucesso."));
+        return Ok(GenericResponse<ContatoDTO>.SucessoResponse(contatoCriado.ToRequest(),
+            "Contato criado com sucesso."));
     }
 
     [HttpPut("{id}")]
@@ -85,7 +86,7 @@ public class ContatosController : ControllerBase
                     "Erro de validação."
                 )
             );
-        
+
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (!Guid.TryParse(userIdClaim, out var userId))
@@ -93,7 +94,7 @@ public class ContatosController : ControllerBase
 
         contatoDto.Id = id;
         await _contatoService.UpdateAsync(contatoDto.ToEntity(userId));
-        return Ok(GenericResponse<string>.SucessoResponse("","Contato atualizado com sucesso."));
+        return Ok(GenericResponse<string>.SucessoResponse("", "Contato atualizado com sucesso."));
     }
 
     [HttpDelete("{id}")]

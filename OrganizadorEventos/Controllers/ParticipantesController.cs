@@ -10,7 +10,7 @@ namespace OrganizadorEventos.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ParticipantesController: ControllerBase
+public class ParticipantesController : ControllerBase
 {
     private readonly IParticipanteService _participanteService;
 
@@ -26,9 +26,10 @@ public class ParticipantesController: ControllerBase
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-        
+
         var participantes = await _participanteService.ListarParticipantes(EventoId);
-        return Ok(GenericResponse<List<ContatoDTO>>.SucessoResponse(participantes,"Participantes recuperados com sucesso."));
+        return Ok(GenericResponse<List<ContatoDTO>>.SucessoResponse(participantes,
+            "Participantes recuperados com sucesso."));
     }
     
     /// <summary>
@@ -60,9 +61,9 @@ public class ParticipantesController: ControllerBase
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-        
+
         await _participanteService.RemoverParticipantesAsync(participantes, EventoId);
-        return Ok(GenericResponse<string>.SucessoResponse("","Participantes removidos com sucesso."));
+        return Ok(GenericResponse<string>.SucessoResponse("", "Participantes removidos com sucesso."));
     }
     
     [HttpPost("evento/{EventoId}/convidar/todos")]
