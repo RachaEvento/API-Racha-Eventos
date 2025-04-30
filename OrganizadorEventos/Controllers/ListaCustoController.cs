@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OrganizadorEventos.DTOs.Custos;
 using OrganizadorEventos.Interfaces.Services;
+using OrganizadorEventos.Request.Evento;
 using OrganizadorEventos.Response;
 
 namespace OrganizadorEventos.Controllers
@@ -33,6 +34,20 @@ namespace OrganizadorEventos.Controllers
             var listas = await _listaCustoService.ListarListasDeCustoPorEventoAsync(eventoId);
             return Ok(GenericResponse<List<ListaCustoResponseDTO>>.SucessoResponse(listas));
         }
+        
+        [HttpGet("evento/{eventoId}/custos")]
+        public async Task<IActionResult> GetEventosComCustos(Guid eventoId)
+        {
+            try
+            {
+                var eventos = await _listaCustoService.ListarEventosComCustosAsync(eventoId);
+                return Ok(GenericResponse<List<EventoComCustosDto>>.SucessoResponse(eventos));
+            }
+            catch (Exception ex)
+            {
+                return Ok(GenericResponse<string>.ErroResponse(new List<string>(), $"Erro ao obter eventos: {ex.Message}"));
+            }
+        }
 
         [HttpPost("participantes/adicionar")]
         public async Task<ActionResult<GenericResponse<string>>> AdicionarParticipantes(
@@ -49,28 +64,5 @@ namespace OrganizadorEventos.Controllers
             await _participanteListaCustoService.RemoverParticipantesAsync(dto);
             return Ok(GenericResponse<string>.SucessoResponse(null, "Participantes removidos com sucesso."));
         }
-        
-        [HttpGet("eventos-com-custos")]
-        public async Task<IActionResult> GetEventosComCustos(Guid eventoId)
-        {
-            try
-            {
-                var eventos = await _listaCustoService.ListarEventosComCustosAsync(eventoId);
-
-                return Ok(new {
-                    sucesso = true,
-                    mensagem = "",
-                    dados = eventos
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new {
-                    sucesso = false,
-                    mensagem = $"Erro ao obter eventos: {ex.Message}"
-                });
-            }
-        }
-
     }
 }
