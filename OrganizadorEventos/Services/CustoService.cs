@@ -6,32 +6,46 @@ using OrganizadorEventos.Model;
 
 namespace OrganizadorEventos.Services;
 
-public class CustoService : ICustoService
+public class CustoService : CrudService<Custo>, ICustoService
 {
     private readonly ICustoRepository _custoRepository;
+    private readonly IListaCustoRepository _listaCustoRepository;
 
-    public CustoService(ICustoRepository custoRepository)
+    public CustoService(ICustoRepository custoRepository, IListaCustoRepository listaCustoRepository): base(custoRepository)
     {
         _custoRepository = custoRepository;
+        _listaCustoRepository = listaCustoRepository;
     }
 
-    public async Task<Guid> AdicionarCustoAsync(AdicionarCustoDTO dto)
+    public async Task<CustoResponseDTO> AdicionarCustoAsync(Guid listaCustoId, AdicionarCustoDTO dto)
     {
         var custo = new Custo
         {
             Id = Guid.NewGuid(),
-            ListaCustoId = dto.ListaCustoId,
+            ListaCustoId = listaCustoId,
             Nome = dto.Nome,
             Valor = dto.Valor
         };
 
         await _custoRepository.CreateAsync(custo);
-        return custo.Id;
+        return custo.ToResponse();
     }
 
+    public async Task RemoverCustoAsync(Guid listaCustoId, RemoverCustoDTO dto)
+    {
+        await _custoRepository.DeleteAsync(dto.custoId);
+    }
+    
     public async Task<List<CustoResponseDTO>> ListarCustosPorListaCustoAsync(Guid listaCustoId)
     {
         var custos = await _custoRepository.GetAllByListaCustoIdAsync(listaCustoId);
+        return custos.Select(c => c.ToResponse()).ToList();
+    }
+    
+    public async Task<List<CustoResponseDTO>> ListarCustosPorParticipanteAsync(Guid participanteId)
+    {
+        var listasCusto = await _listaCustoRepository.GetAllByParticipanteIdAsync(participanteId);
+        var custos = listasCusto.SelectMany(l => l.Custos).ToList();
         return custos.Select(c => c.ToResponse()).ToList();
     }
 }

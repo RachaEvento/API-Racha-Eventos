@@ -5,11 +5,11 @@ using OrganizadorEventos.Model;
 
 namespace OrganizadorEventos.Repository;
 
-public class CustoRepository : ICustoRepository
+public class CustoRepository : CrudRepository<Custo>, ICustoRepository
 {
     private readonly AppDbContext _context;
 
-    public CustoRepository(AppDbContext context)
+    public CustoRepository(AppDbContext context): base(context)
     {
         _context = context;
     }

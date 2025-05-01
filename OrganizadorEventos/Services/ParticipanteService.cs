@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using OrganizadorEventos.DTOs.Email;
+using OrganizadorEventos.DTOs.Participantes;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
@@ -23,14 +24,14 @@ public class ParticipanteService : IParticipanteService
         _eventoRepository = eventoRepository;
     }
 
-    public async Task AdicionarContatosComoParticipantesAsync(List<Guid> contatos, Guid eventoId)
+    public async Task AdicionarContatosComoParticipantesAsync(AdicionarParticipanteDTO contatos, Guid eventoId)
     {
-        await _participanteRepository.CreateAllFromContactsAsync(contatos, eventoId);
+        await _participanteRepository.CreateAllFromContactsAsync(contatos.ContatoIds, eventoId);
     }
 
-    public async Task RemoverParticipantesAsync(List<Guid> participantes, Guid eventoId)
+    public async Task RemoverParticipantesAsync(RemoverParticipanteDTO participantes, Guid eventoId)
     {
-        await _participanteRepository.RemoveParticipantsAsync(participantes, eventoId);
+        await _participanteRepository.RemoveParticipantsAsync(participantes.ParticipantesIds, eventoId);
     }
 
     public async Task<List<ContatoDTO>> ListarParticipantes(Guid eventoId)

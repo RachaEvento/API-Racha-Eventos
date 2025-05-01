@@ -98,4 +98,12 @@ public class ParticipanteRepository : CrudRepository<Participante>, IParticipant
             .Include(p => p.Evento)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
+
+    public async Task<List<Participante>> GetAllConfirmedByEventIdAsync(Guid eventoId)
+    {
+        return await _dbSet
+            .Where(p => p.EventoId == eventoId && p.Status == (int)StatusParticipante.Confirmado)
+            .Include(p => p.Contato) // Eager load Contato
+            .ToListAsync();
+    }
 }

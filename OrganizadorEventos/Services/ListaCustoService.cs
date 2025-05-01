@@ -1,8 +1,10 @@
 using OrganizadorEventos.DTOs.Custos;
+using OrganizadorEventos.DTOs.ListaCusto;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
 using OrganizadorEventos.Model;
+using OrganizadorEventos.Request;
 using OrganizadorEventos.Request.Evento;
 using OrganizadorEventos.Response;
 
@@ -20,38 +22,40 @@ public class ListaCustoService : IListaCustoService
         _listaCustoRepository = listaCustoRepository;
     }
 
-    public async Task<GenericResponse<string>> CriarListaCustoAsync(CriarListaCustoDTO dto)
+    public async Task<string> CriarListaCustoAsync(Guid eventoId, CriarListaCustoDTO dto)
     {
         var listaCusto = new ListaCusto
         {
             Id = Guid.NewGuid(),
-            EventoId = dto.EventoId,
+            EventoId = eventoId,
             Nome = dto.Nome
         };
 
         await _listaCustoRepository.CreateAsync(listaCusto);
 
-        return GenericResponse<string>.SucessoResponse("Lista de custo criada com sucesso.");
+        return "Lista de custo criada com sucesso.";
     }
-    
-    public async Task<List<ListaCustoResponseDTO>> ListarListasDeCustoPorEventoAsync(Guid eventoId)
-    {
-        var listasCusto = await _listaCustoRepository.GetAllByEventoIdAsync(eventoId);
-        return listasCusto.ToResponse();
-    }
-    public async Task<List<EventoComCustosDto>> ListarEventosComCustosAsync(Guid eventoId)
+    public async Task<List<ListaCustosComCustosEParticipantesDto>> ListarListaCustosComCustosEParticipantesAsync(Guid eventoId)
     {
         var eventos = await _listaCustoRepository.ObterTodosComCustosAsync(eventoId);
-
-        return eventos.Select(e => new EventoComCustosDto
+        
+        return eventos.Select(lc => new ListaCustosComCustosEParticipantesDto
         {
-            Id = e.Id,
-            Nome = e.Nome,
-            Custo = e.Custos.Select(c => new CustoDto
+            Id = lc.Id,
+            Nome = lc.Nome,
+            Custos = lc.Custos.Select(c => new CustoDTO
             {
                 Id = c.Id,
                 Nome = c.Nome,
                 Valor = c.Valor
+            }).ToList(),
+            Participantes = lc.ParticipanteListaCustos.Select(c => new ContatoDTO
+            {
+                Id = c.Participante.Id,
+                Nome = c.Participante.Contato.Nome,
+                Email = c.Participante.Contato.Email,
+                Telefone = c.Participante.Contato.Telefone,
+                Ativo = c.Participante.Contato.Ativo
             }).ToList()
         }).ToList();
     }

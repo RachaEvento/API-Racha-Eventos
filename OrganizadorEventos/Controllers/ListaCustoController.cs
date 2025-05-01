@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OrganizadorEventos.DTOs.Custos;
+using OrganizadorEventos.DTOs.ListaCusto;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Request.Evento;
 using OrganizadorEventos.Response;
@@ -20,49 +21,61 @@ namespace OrganizadorEventos.Controllers
             _listaCustoService = listaCustoService;
             _participanteListaCustoService = participanteListaCustoService;
         }
-
-        [HttpPost]
-        public async Task<ActionResult<GenericResponse<string>>> CriarListaCusto([FromBody] CriarListaCustoDTO dto)
-        {
-            var response = await _listaCustoService.CriarListaCustoAsync(dto);
-            return Ok(response);
-        }
-
-        [HttpGet("evento/{eventoId}")]
-        public async Task<ActionResult<GenericResponse<List<ListaCustoResponseDTO>>>> ListarListasPorEvento(Guid eventoId)
-        {
-            var listas = await _listaCustoService.ListarListasDeCustoPorEventoAsync(eventoId);
-            return Ok(GenericResponse<List<ListaCustoResponseDTO>>.SucessoResponse(listas));
-        }
         
-        [HttpGet("evento/{eventoId}/custos")]
-        public async Task<IActionResult> GetEventosComCustos(Guid eventoId)
+        [HttpGet("evento/{eventoId}")]
+        public async Task<ActionResult<GenericResponse<List<ListaCustosComCustosEParticipantesDto>>>> ListarListasCustoPorEvento(Guid eventoId)
         {
             try
             {
-                var eventos = await _listaCustoService.ListarEventosComCustosAsync(eventoId);
-                return Ok(GenericResponse<List<EventoComCustosDto>>.SucessoResponse(eventos));
+                var listas = await _listaCustoService.ListarListaCustosComCustosEParticipantesAsync(eventoId);
+                return Ok(GenericResponse<List<ListaCustosComCustosEParticipantesDto>>.SucessoResponse(listas));
             }
             catch (Exception ex)
             {
-                return Ok(GenericResponse<string>.ErroResponse(new List<string>(), $"Erro ao obter eventos: {ex.Message}"));
+                return BadRequest(GenericResponse<string>.ErroResponse(new List<string>() { ex.Message }, "Erro ao listar listas de custos do evento."));
             }
         }
 
-        [HttpPost("participantes/adicionar")]
-        public async Task<ActionResult<GenericResponse<string>>> AdicionarParticipantes(
-            [FromBody] AdicionarParticipantesListaCustoDTO dto)
+        [HttpPost("evento/{eventoId}/criar")]
+        public async Task<ActionResult<GenericResponse<string>>> CriarListaCusto(Guid eventoId, [FromBody] CriarListaCustoDTO dto)
         {
-            await _participanteListaCustoService.AdicionarParticipantesAsync(dto);
-            return Ok(GenericResponse<string>.SucessoResponse(null, "Participantes adicionados com sucesso."));
+            try
+            {
+                var response = await _listaCustoService.CriarListaCustoAsync(eventoId, dto);
+                return Ok(GenericResponse<string>.SucessoResponse(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(GenericResponse<string>.ErroResponse(new List<string>() { ex.Message }, "Erro ao criar lista de custos."));
+            }
         }
 
-        [HttpPost("participantes/remover")]
-        public async Task<ActionResult<GenericResponse<string>>> RemoverParticipantes(
-            [FromBody] RemoverParticipantesListaCustoDTO dto)
+        [HttpPost("{listaCustoId}/participantes/adicionar")]
+        public async Task<ActionResult<GenericResponse<string>>> AdicionarParticipantes( Guid listaCustoId, [FromBody] AdicionarParticipantesListaCustoDTO dto)
         {
-            await _participanteListaCustoService.RemoverParticipantesAsync(dto);
-            return Ok(GenericResponse<string>.SucessoResponse(null, "Participantes removidos com sucesso."));
+            try
+            {
+                await _participanteListaCustoService.AdicionarParticipantesAsync(listaCustoId, dto);
+                return Ok(GenericResponse<string>.SucessoResponse(null, "Participantes adicionados com sucesso."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(GenericResponse<string>.ErroResponse(new List<string>() { ex.Message }, "Erro ao adicionar participante na lista de custo"));
+            }
+        }
+
+        [HttpPost("{listaCustoId}/participantes/remover")]
+        public async Task<ActionResult<GenericResponse<string>>> RemoverParticipantes(Guid listaCustoId, [FromBody] RemoverParticipantesListaCustoDTO dto)
+        {
+            try
+            {
+                await _participanteListaCustoService.RemoverParticipantesAsync(listaCustoId, dto);
+                return Ok(GenericResponse<string>.SucessoResponse(null, "Participantes removidos com sucesso."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(GenericResponse<string>.ErroResponse(new List<string>() { ex.Message }, "Erro ao remover participante na lista de custo"));
+            }
         }
     }
 }

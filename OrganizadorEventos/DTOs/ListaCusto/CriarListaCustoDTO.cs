@@ -1,7 +1,6 @@
-namespace OrganizadorEventos.DTOs.Custos;
+namespace OrganizadorEventos.DTOs.ListaCusto;
 
 public class CriarListaCustoDTO
 {
-    public Guid EventoId { get; set; }
     public string Nome { get; set; } = null!;
 }
