@@ -8,4 +8,5 @@ public interface IParticipanteRepository : ICrudRepository<Participante>
     Task RemoveParticipantsAsync(List<Guid> contatosParticipantes, Guid eventoId);
     Task<List<Participante>> GetAllByEventId(Guid eventoId);
     new Task<Participante> GetByIdAsync(Guid id);
+    Task<List<Participante>> GetAllConfirmedByEventIdAsync(Guid eventoId);
 }

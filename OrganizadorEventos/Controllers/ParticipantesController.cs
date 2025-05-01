@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrganizadorEventos.DTOs.Email;
+using OrganizadorEventos.DTOs.Participantes;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Request;
 using OrganizadorEventos.Response;
@@ -32,14 +33,9 @@ public class ParticipantesController : ControllerBase
             "Participantes recuperados com sucesso."));
     }
     
-    /// <summary>
-    /// Adiciona participantes a um evento.
-    /// </summary>
-    /// <param name="EventoId">ID do evento.</param>
-    /// <param name="contatos">Lista de IDs dos contatos a serem adicionados.</param>
     [HttpPost("evento/{EventoId}/adicionar")]
     [Authorize]
-    public async Task<IActionResult> AddParticipants(Guid EventoId, [FromBody] List<Guid> contatos)
+    public async Task<IActionResult> AddParticipants(Guid EventoId, [FromBody] AdicionarParticipanteDTO contatos)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
@@ -49,14 +45,9 @@ public class ParticipantesController : ControllerBase
         return Ok(GenericResponse<string>.SucessoResponse("","Participantes adicionados com sucesso."));
     }
     
-    /// <summary>
-    /// Remove participantes a um evento.
-    /// </summary>
-    /// <param name="EventoId">ID do evento.</param>
-    /// <param name="participantes">Lista de IDs dos participantes a serem removidos.</param>
     [HttpPost("evento/{EventoId}/remover")]
     [Authorize]
-    public async Task<IActionResult> RemoveParticipants(Guid EventoId, [FromBody] List<Guid> participantes)
+    public async Task<IActionResult> RemoveParticipants(Guid EventoId, [FromBody] RemoverParticipanteDTO participantes)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))

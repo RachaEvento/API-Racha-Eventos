@@ -8,5 +8,6 @@ public interface IListaCustoRepository
     Task<List<ListaCusto>> GetAllByEventoIdAsync(Guid eventoId);
     Task<ListaCusto?> GetByIdAsync(Guid id);
     Task<List<ListaCusto>> ObterTodosComCustosAsync(Guid eventoId);
+    Task<List<ListaCusto>> GetAllByParticipanteIdAsync(Guid participanteId);
 
 }

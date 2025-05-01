@@ -1,4 +1,5 @@
 using OrganizadorEventos.DTOs.Custos;
+using OrganizadorEventos.DTOs.ListaCusto;
 using OrganizadorEventos.Request.Evento;
 using OrganizadorEventos.Response;
 
@@ -6,8 +7,7 @@ namespace OrganizadorEventos.Interfaces.Services;
 
 public interface IListaCustoService
 {
-    Task<GenericResponse<string>> CriarListaCustoAsync(CriarListaCustoDTO dto);
-    Task<List<ListaCustoResponseDTO>> ListarListasDeCustoPorEventoAsync(Guid eventoId);
-    Task<List<EventoComCustosDto>> ListarEventosComCustosAsync(Guid eventoId);
+    Task<string> CriarListaCustoAsync(Guid eventoId, CriarListaCustoDTO dto);
+    Task<List<ListaCustosComCustosEParticipantesDto>> ListarListaCustosComCustosEParticipantesAsync(Guid eventoId);
 
 }

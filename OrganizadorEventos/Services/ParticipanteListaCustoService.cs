@@ -13,13 +13,13 @@ public class ParticipanteListaCustoService : IParticipanteListaCustoService
         _participanteListaCustoRepository = participanteListaCustoRepository;
     }
 
-    public async Task AdicionarParticipantesAsync(AdicionarParticipantesListaCustoDTO dto)
+    public async Task AdicionarParticipantesAsync(Guid listaCustoId, AdicionarParticipantesListaCustoDTO dto)
     {
-        await _participanteListaCustoRepository.CreateAllAsync(dto.ListaCustoId, dto.ParticipantesIds);
+        await _participanteListaCustoRepository.CreateAllAsync(listaCustoId, dto.ParticipantesIds);
     }
 
-    public async Task RemoverParticipantesAsync(RemoverParticipantesListaCustoDTO dto)
+    public async Task RemoverParticipantesAsync(Guid listaCustoId, RemoverParticipantesListaCustoDTO dto)
     {
-        await _participanteListaCustoRepository.RemoveAllAsync(dto.ListaCustoId, dto.ParticipantesIds);
+        await _participanteListaCustoRepository.RemoveAllAsync(listaCustoId, dto.ParticipantesIds);
     }
 }

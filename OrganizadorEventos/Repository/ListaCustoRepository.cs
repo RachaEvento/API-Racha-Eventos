@@ -40,7 +40,17 @@ public class ListaCustoRepository : IListaCustoRepository
         return await _context.ListaCustos
             .Where(l => l.EventoId == eventoId) 
             .Include(l => l.Custos)
+            .Include(l => l.ParticipanteListaCustos)
+                .ThenInclude(plc => plc.Participante)
+                .ThenInclude(p => p.Contato)
             .ToListAsync();
     }
 
+    public async Task<List<ListaCusto>> GetAllByParticipanteIdAsync(Guid participanteId)
+    {
+        return await _context.ListaCustos
+            .Include(l => l.Custos)
+            .Where(l => l.ParticipanteListaCustos.Any(p => p.ParticipanteId == participanteId))
+            .ToListAsync();
+    }
 }
