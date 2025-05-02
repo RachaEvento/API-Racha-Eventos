@@ -1,11 +1,11 @@
-﻿using System.Security.Cryptography;
-using OrganizadorEventos.DTOs.Email;
+﻿using OrganizadorEventos.DTOs.Email;
 using OrganizadorEventos.DTOs.Participantes;
+using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
 using OrganizadorEventos.Request;
-using OrganizadorEventos.Util;
+using OrganizadorEventos.Request.Evento;
 
 namespace OrganizadorEventos.Services;
 
@@ -61,7 +61,7 @@ public class ParticipanteService : IParticipanteService
             QuemConvidaNome = usuario.UserName,
             EventoNome = evento.Nome,
             EventoData = evento.DataInicio,
-            CodigoConfirmacao = $"{ConviteUtil.GuidTo12DigitId(participante.Id)}"
+            CodigoConfirmacao = participante.Id.ToString()
         };
 
         try
@@ -73,6 +73,56 @@ public class ParticipanteService : IParticipanteService
         {
             System.Diagnostics.Debug.WriteLine($"Failed to send invitation to {contato.Email}, error: {ex.Message}");
         }
+    }
+
+    public async Task ConfirmarParticipante(Guid participanteId)
+    {
+        var participante = await _participanteRepository.GetByIdAsync(participanteId);
+        if (participante == null)
+            throw new Exception("Participante não encontrado.");
+        
+        participante.Status = (int)StatusParticipante.Confirmado;
+
+        if (participante.Status == (int)StatusParticipante.Pendente)
+        {
+            await _participanteRepository.UpdateAsync(participante);
+        }
+    }
+
+    public async Task RecusarParticipante(Guid participanteId)
+    {
+        var participante = await _participanteRepository.GetByIdAsync(participanteId);
+        if (participante == null)
+            throw new Exception("Participante não encontrado.");
+        
+        participante.Status = (int)StatusParticipante.Recusado;
+        
+        if (participante.Status == (int)StatusParticipante.Pendente)
+        {
+            await _participanteRepository.UpdateAsync(participante);
+        }
+    }
+
+    public async Task<ConviteParticipanteDTO> ConviteParticipante(Guid participanteId)
+    {
+        var participante = await _participanteRepository.GetByIdAsync(participanteId);
+        
+        var contatoParticipante = new ContatoDTO()
+        {
+            Id = participante.Id,
+            Nome = participante.Contato.Nome,
+            Email = participante.Contato.Email,
+            Telefone = participante.Contato.Telefone,
+            Ativo = participante.Contato.Ativo
+        };
+        var evento = participante.Evento.ToRequest();
+        
+        return new ConviteParticipanteDTO()
+        {
+            contatoParticipante = contatoParticipante,
+            evento = evento,
+            status = (StatusParticipante)participante.Status
+        };
     }
 
     public async Task ConvidarTodosParticipantesEvento(Guid eventoId)
@@ -92,7 +142,7 @@ public class ParticipanteService : IParticipanteService
                     QuemConvidaNome = usuario.UserName,
                     EventoNome = evento.Nome,
                     EventoData = evento.DataInicio,
-                    CodigoConfirmacao = $"{ConviteUtil.GuidTo12DigitId(participante.Id)}"
+                    CodigoConfirmacao = participante.Id.ToString()
                 };
 
                 try

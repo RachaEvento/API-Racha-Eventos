@@ -80,4 +80,28 @@ public class ParticipantesController : ControllerBase
         await _participanteService.ConvidarParticipante(ParticipanteId);
         return Ok(GenericResponse<string>.SucessoResponse("","Email encaminhados"));
     }
+    
+    [HttpPost("{ParticipanteId}/confirmar")]
+    [Authorize]
+    public async Task<IActionResult> ConfirmarParticipante(Guid ParticipanteId)
+    {
+        await _participanteService.ConfirmarParticipante(ParticipanteId);
+        return Ok(GenericResponse<string>.SucessoResponse("","Participante confirmado."));
+    }
+    
+    [HttpPost("{ParticipanteId}/recusar")]
+    [Authorize]
+    public async Task<IActionResult> RecusarParticipante(Guid ParticipanteId)
+    {
+        await _participanteService.RecusarParticipante(ParticipanteId);
+        return Ok(GenericResponse<string>.SucessoResponse("","Participante recusado."));
+    }
+    
+    [HttpGet("{ParticipanteId}/convite")]
+    [Authorize]
+    public async Task<IActionResult> ConviteParticipante(Guid ParticipanteId)
+    {
+        var convite = await _participanteService.ConviteParticipante(ParticipanteId);
+        return Ok(GenericResponse<ConviteParticipanteDTO>.SucessoResponse(convite,"Convite recuperado com sucesso."));
+    }
 }
