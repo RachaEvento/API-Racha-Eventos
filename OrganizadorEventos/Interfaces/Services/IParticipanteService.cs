@@ -10,4 +10,7 @@ public interface IParticipanteService
     Task<List<ContatoDTO>> ListarParticipantes(Guid eventoId);
     Task ConvidarTodosParticipantesEvento(Guid eventoId);
     Task ConvidarParticipante(Guid participanteId);
+    Task ConfirmarParticipante(Guid participanteId);
+    Task RecusarParticipante(Guid participanteId);
+    Task<ConviteParticipanteDTO> ConviteParticipante(Guid participanteId);
 }
