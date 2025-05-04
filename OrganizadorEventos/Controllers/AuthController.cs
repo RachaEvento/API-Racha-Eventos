@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrganizadorEventos.DTOs.Autenticacao;
 using OrganizadorEventos.Interfaces.Services;
@@ -54,16 +56,25 @@ public class AuthController : ControllerBase
                 "Erro ao registrar usuário."));
         }
     }
+    [Authorize]
     [HttpPatch("atualizar")]
     public async Task<IActionResult> AtualizarUsuario([FromBody] UpdateUsuarioDTO updateDto)
     {
-        var userId = User?.Identity?.Name; // ou use um claim como sub ou jti
-        if (userId == null)
+        var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null)
+        {
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não autenticado." }));
+        }
+
+        if (!Guid.TryParse(userIdClaim.Value, out Guid userId))
+        {
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "ID de usuário inválido no token." }));
+        }
 
         try
         {
-            await _authService.AtualizarUsuarioAsync(Guid.Parse(userId), updateDto);
+            await _authService.AtualizarUsuarioAsync(userId, updateDto);
             return Ok(GenericResponse<string>.SucessoResponse(null, "Usuário atualizado com sucesso."));
         }
         catch (ArgumentException ex)
@@ -71,5 +82,7 @@ public class AuthController : ControllerBase
             return BadRequest(GenericResponse<string>.ErroResponse(new List<string> { ex.Message }, "Erro ao atualizar usuário."));
         }
     }
+
+
 
 }
