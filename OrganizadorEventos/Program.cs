@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using OrganizadorEventos;
 using OrganizadorEventos.Data;
 using OrganizadorEventos.Enum;
+using OrganizadorEventos.IdentityErrorDescriber;
 using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
@@ -60,7 +61,8 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddIdentity<Usuario, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddErrorDescriber<IdentityErrorDescriberPtBr>();
 
 //Custos
 builder.Services.AddScoped<ICustoRepository, CustoRepository>();
