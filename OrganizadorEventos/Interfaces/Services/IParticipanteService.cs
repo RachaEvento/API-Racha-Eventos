@@ -13,4 +13,5 @@ public interface IParticipanteService
     Task ConfirmarParticipante(Guid participanteId);
     Task RecusarParticipante(Guid participanteId);
     Task<ConviteParticipanteDTO> ConviteParticipante(Guid participanteId);
+    Task<InformacoesPagamentoDTO> InformacoesPagamento(Guid participanteId);
 }

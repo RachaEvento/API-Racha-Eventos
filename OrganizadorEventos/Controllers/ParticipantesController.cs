@@ -104,4 +104,12 @@ public class ParticipantesController : ControllerBase
         var convite = await _participanteService.ConviteParticipante(ParticipanteId);
         return Ok(GenericResponse<ConviteParticipanteDTO>.SucessoResponse(convite,"Convite recuperado com sucesso."));
     }
+    
+    [HttpGet("{ParticipanteId}/pagamento")]
+    [Authorize]
+    public async Task<IActionResult> InformacoesPagamento(Guid ParticipanteId)
+    {
+        var informacoes = await _participanteService.InformacoesPagamento(ParticipanteId);
+        return Ok(GenericResponse<InformacoesPagamentoDTO>.SucessoResponse(informacoes,"Informações recuperadas com sucesso."));
+    }
 }

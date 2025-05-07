@@ -15,13 +15,17 @@ public class ParticipanteService : IParticipanteService
     private readonly IEmailService _emailService;
     private readonly IContatoRepository _contatoRepository;
     private readonly IEventoRepository _eventoRepository;
+    private readonly IRelatorioEventoService _relatorioEventoService;
+    private readonly IPixService _pixService;
 
-    public ParticipanteService(IParticipanteRepository participanteRepository, IEmailService emailService, IContatoRepository contatoRepository, IEventoRepository eventoRepository)
+    public ParticipanteService(IParticipanteRepository participanteRepository, IEmailService emailService, IContatoRepository contatoRepository, IEventoRepository eventoRepository, IPixService pixService, IRelatorioEventoService relatorioEventoService)
     {
         _participanteRepository = participanteRepository;
         _emailService = emailService;
         _contatoRepository = contatoRepository;
         _eventoRepository = eventoRepository;
+        _pixService = pixService;
+        _relatorioEventoService = relatorioEventoService;
     }
 
     public async Task AdicionarContatosComoParticipantesAsync(AdicionarParticipanteDTO contatos, Guid eventoId)
@@ -122,6 +126,29 @@ public class ParticipanteService : IParticipanteService
             contatoParticipante = contatoParticipante,
             evento = evento,
             status = (StatusParticipante)participante.Status
+        };
+    }
+
+    public async Task<InformacoesPagamentoDTO> InformacoesPagamento(Guid participanteId)
+    {
+        var participante = await _participanteRepository.GetByIdAsync(participanteId);
+        var custoParticipante = await _relatorioEventoService.CalcularCustoParticipanteAsync(participante);
+        
+        var usuario = participante.Evento.Usuario;
+        
+        var nomeLimpo = participante.Contato.Nome.Replace(" ", "");
+        var nomeSeguro = nomeLimpo.Substring(0, Math.Min(15, nomeLimpo.Length));
+        var pix = await _pixService.GeneratePixQrCodeAsync(usuario.ChavePix, usuario.UserName, "Criciúma", custoParticipante.Custo, participante.Evento.Nome, "PAGTO" + nomeSeguro);
+
+        return new InformacoesPagamentoDTO()
+        {
+            contatoParticipante = custoParticipante.Participante,
+            evento = participante.Evento.ToRequest(),
+            status = (StatusParticipante)participante.Status,
+            stringPix = pix,
+            tipoChavePix = usuario.TipoChavePix,
+            chavePix = usuario.ChavePix,
+            valor = custoParticipante.Custo,
         };
     }
 

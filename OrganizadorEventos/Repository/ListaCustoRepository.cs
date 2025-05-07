@@ -50,6 +50,7 @@ public class ListaCustoRepository : IListaCustoRepository
     {
         return await _context.ListaCustos
             .Include(l => l.Custos)
+            .Include(l => l.ParticipanteListaCustos)
             .Where(l => l.ParticipanteListaCustos.Any(p => p.ParticipanteId == participanteId))
             .ToListAsync();
     }
