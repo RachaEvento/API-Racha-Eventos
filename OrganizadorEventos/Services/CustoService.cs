@@ -42,10 +42,26 @@ public class CustoService : CrudService<Custo>, ICustoService
         return custos.Select(c => c.ToResponse()).ToList();
     }
     
-    public async Task<List<CustoResponseDTO>> ListarCustosPorParticipanteAsync(Guid participanteId)
+    public async Task<List<CustoResponseDTO>> ListarCustosDTOPorParticipanteAsync(Guid participanteId)
     {
         var listasCusto = await _listaCustoRepository.GetAllByParticipanteIdAsync(participanteId);
         var custos = listasCusto.SelectMany(l => l.Custos).ToList();
         return custos.Select(c => c.ToResponse()).ToList();
+    }
+    
+    public async Task<List<Custo>> ListarCustosPorParticipanteAsync(Guid participanteId)
+    {
+        var listasCusto = await _listaCustoRepository.GetAllByParticipanteIdAsync(participanteId);
+        return listasCusto.SelectMany(l => l.Custos).ToList();
+    }
+
+    public async Task<List<Participante>> ListarParticipantesPorCustoAsync(Guid custoId)
+    {
+        var custo = await _custoRepository.GetByIdAsync(custoId);
+        
+        if (custo == null)
+            return new List<Participante>();
+        
+        return custo.ListaCusto.ParticipanteListaCustos.Select(p => p.Participante).ToList();
     }
 }

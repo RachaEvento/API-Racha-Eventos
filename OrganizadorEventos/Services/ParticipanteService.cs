@@ -1,9 +1,12 @@
-﻿using OrganizadorEventos.DTOs.Email;
+﻿using Google.Apis.Drive.v3.Data;
+using OrganizadorEventos.DTOs.Email;
 using OrganizadorEventos.DTOs.Participantes;
 using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
+using OrganizadorEventos.Model;
+using OrganizadorEventos.Repository;
 using OrganizadorEventos.Request;
 using OrganizadorEventos.Request.Evento;
 
@@ -15,13 +18,19 @@ public class ParticipanteService : IParticipanteService
     private readonly IEmailService _emailService;
     private readonly IContatoRepository _contatoRepository;
     private readonly IEventoRepository _eventoRepository;
+    private readonly IRelatorioEventoService _relatorioEventoService;
+    private readonly IPixService _pixService;
+    private readonly IPagamentoParticipanteRepository _pagamentoParticipanteRepository;
 
-    public ParticipanteService(IParticipanteRepository participanteRepository, IEmailService emailService, IContatoRepository contatoRepository, IEventoRepository eventoRepository)
+    public ParticipanteService(IParticipanteRepository participanteRepository, IEmailService emailService, IContatoRepository contatoRepository, IEventoRepository eventoRepository, IPixService pixService, IRelatorioEventoService relatorioEventoService, IPagamentoParticipanteRepository pagamentoParticipanteRepository)
     {
         _participanteRepository = participanteRepository;
         _emailService = emailService;
         _contatoRepository = contatoRepository;
         _eventoRepository = eventoRepository;
+        _pixService = pixService;
+        _relatorioEventoService = relatorioEventoService;
+        _pagamentoParticipanteRepository = pagamentoParticipanteRepository;
     }
 
     public async Task AdicionarContatosComoParticipantesAsync(AdicionarParticipanteDTO contatos, Guid eventoId)
@@ -34,15 +43,10 @@ public class ParticipanteService : IParticipanteService
         await _participanteRepository.RemoveParticipantsAsync(participantes.ParticipantesIds, eventoId);
     }
 
-    public async Task<List<ContatoDTO>> ListarParticipantes(Guid eventoId)
+    public async Task<List<ParticipanteDTO>> ListarParticipantes(Guid eventoId)
     {
         var participantes = await _participanteRepository.GetAllByEventId(eventoId);
-        var contatosParticipantes = participantes.Select(p =>
-        {
-            var dto = p.Contato.ToRequest();
-            dto.Id = p.Id;
-            return dto;
-        }).ToList();
+        var contatosParticipantes = participantes.Select(p => p.ToRequest()).ToList();
         
         return contatosParticipantes;
     }
@@ -80,11 +84,10 @@ public class ParticipanteService : IParticipanteService
         var participante = await _participanteRepository.GetByIdAsync(participanteId);
         if (participante == null)
             throw new Exception("Participante não encontrado.");
-        
-        participante.Status = (int)StatusParticipante.Confirmado;
 
         if (participante.Status == (int)StatusParticipante.Pendente)
         {
+            participante.Status = (int)StatusParticipante.Confirmado;
             await _participanteRepository.UpdateAsync(participante);
         }
     }
@@ -95,10 +98,9 @@ public class ParticipanteService : IParticipanteService
         if (participante == null)
             throw new Exception("Participante não encontrado.");
         
-        participante.Status = (int)StatusParticipante.Recusado;
-        
         if (participante.Status == (int)StatusParticipante.Pendente)
         {
+            participante.Status = (int)StatusParticipante.Recusado;
             await _participanteRepository.UpdateAsync(participante);
         }
     }
@@ -123,6 +125,47 @@ public class ParticipanteService : IParticipanteService
             evento = evento,
             status = (StatusParticipante)participante.Status
         };
+    }
+
+    public async Task<InformacoesPagamentoDTO> InformacoesPagamento(Guid participanteId)
+    {
+        var participante = await _participanteRepository.GetByIdAsync(participanteId);
+        var custoParticipante = await _relatorioEventoService.CalcularCustoParticipanteAsync(participante);
+        
+        var usuario = participante.Evento.Usuario;
+        
+        var nomeLimpo = participante.Contato.Nome.Replace(" ", "");
+        var nomeSeguro = nomeLimpo.Substring(0, Math.Min(15, nomeLimpo.Length)).ToUpper();
+        var pix = await _pixService.GeneratePixQrCodeAsync(usuario.ChavePix, usuario.UserName, "Criciúma", custoParticipante.Custo, participante.Evento.Nome, $"PGT{nomeSeguro}");
+
+        var pagamentos = participante.Pagamento?.OrderByDescending(pag => pag.DataPagamento);
+        var statusPagamento = (StatusPagamento?)pagamentos?.FirstOrDefault()?.Status ?? StatusPagamento.Pendente;
+
+        return new InformacoesPagamentoDTO()
+        {
+            contatoParticipante = custoParticipante.Participante,
+            evento = participante.Evento.ToRequest(),
+            statusParticipante = (StatusParticipante)participante.Status,
+            statusPagamento = statusPagamento,
+            stringPix = pix,
+            tipoChavePix = usuario.TipoChavePix,
+            chavePix = usuario.ChavePix,
+            valor = custoParticipante.Custo,
+        };
+    }
+
+    public async Task SalvarPagamento(Guid participanteId, string fileId)
+    {
+        var pagamento = new PagamentoParticipante()
+        {
+            Id = Guid.NewGuid(),
+            ParticipanteId = participanteId,
+            Comprovante = fileId,
+            Status = (int)StatusPagamento.Enviado,
+            DataPagamento = DateTime.UtcNow
+        };
+
+        await _pagamentoParticipanteRepository.CreateAsync(pagamento);
     }
 
     public async Task ConvidarTodosParticipantesEvento(Guid eventoId)
@@ -157,6 +200,33 @@ public class ParticipanteService : IParticipanteService
             }
         });
     }
-    
-    
+
+    public async Task<ListaPagamentosDTO> ListarPagamentoParticipante(Guid participanteId)
+    {
+        var participante = await _participanteRepository.GetByIdAsync(participanteId);
+        var custoParticipante = await _relatorioEventoService.CalcularCustoParticipanteAsync(participante);
+        var pagamentos = await _pagamentoParticipanteRepository.GetAllByParticipanteIdAsync(participanteId);
+        
+        var listaPagamentos = pagamentos.Select(p => new PagamentosDTO
+        {
+            dataPagamento = p.DataPagamento,
+            pagamentoId = p.Id,
+            statusPagamento = (StatusPagamento)p.Status
+        }).ToList();
+        
+        return new ListaPagamentosDTO()
+        {
+            participante = participante.ToRequest(),
+            statusParticipante = (StatusParticipante)participante.Status,
+            valor = custoParticipante.Custo,
+            pagamentos = listaPagamentos
+        };
+    }
+
+    public async Task AlterarPagamentoParticipante(Guid pagamentoId, StatusPagamento status)
+    {
+        var pagamentoParticipante = await _pagamentoParticipanteRepository.GetByIdAsync(pagamentoId);
+        pagamentoParticipante.Status = (int)status;
+        await _pagamentoParticipanteRepository.UpdateAsync(pagamentoParticipante);
+    }
 }

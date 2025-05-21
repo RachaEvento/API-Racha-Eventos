@@ -1,8 +1,10 @@
 ﻿using OrganizadorEventos.DTOs.Relatorio;
+using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
+using OrganizadorEventos.Model;
 
 namespace OrganizadorEventos.Services;
 
@@ -32,7 +34,7 @@ public class RelatorioEventoService : IRelatorioEventoService
         // Busca todos os custos de todos os participantes
         foreach (var participante in participantes)
         {
-            var custos = await _custoService.ListarCustosPorParticipanteAsync(participante.Id);
+            var custos = await _custoService.ListarCustosDTOPorParticipanteAsync(participante.Id);
             foreach (var custo in custos)
             {
                 if (!custosPorParticipante.ContainsKey(custo.Id))
@@ -66,5 +68,25 @@ public class RelatorioEventoService : IRelatorioEventoService
         }).ToList();
 
         return resultado;
+    }
+
+    public async Task<CustoParticipanteDTO> CalcularCustoParticipanteAsync(Participante participante)
+    {
+        if (participante == null || participante.Status != (int)StatusParticipante.Confirmado)
+            return null;
+        
+        var custoTotal = 0m;
+        var custos = await _custoService.ListarCustosPorParticipanteAsync(participante.Id);
+        foreach (var custo in custos)
+        {
+            var totalDesseCusto = custo.Valor / custo.ListaCusto.ParticipanteListaCustos.Count;
+            custoTotal += totalDesseCusto;
+        }
+
+        return new CustoParticipanteDTO
+        {
+            Participante = participante.Contato.ToRequest(),
+            Custo = custoTotal
+        };
     }
 }

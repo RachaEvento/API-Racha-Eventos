@@ -5,7 +5,8 @@ public class PagamentoParticipante
     public Guid Id { get; set; }
     public Guid ParticipanteId { get; set; }
     public string Comprovante { get; set; } = null!;
-    public bool? Aceito { get; set; }
+    public int Status { get; set; }
+    public DateTime DataPagamento { get; set; } = DateTime.UtcNow;
 
     public Participante Participante { get; set; } = null!;
 }

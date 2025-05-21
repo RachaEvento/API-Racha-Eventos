@@ -92,6 +92,10 @@ builder.Services.AddScoped<ILocalService, LocalService>();
 builder.Services.AddScoped<IParticipanteService, ParticipanteService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRelatorioEventoService, RelatorioEventoService>();
+builder.Services.AddScoped<IPixService, PixService>();
+builder.Services.AddScoped<IGoogleDriveService, GoogleDriveService>();
+builder.Services.AddScoped<IPagamentoParticipanteRepository, PagamentoParticipanteRepository>();
+builder.Services.AddHttpClient();
 
 builder.Services.RegisterJWT(builder.Configuration);
 
