@@ -8,7 +8,8 @@ public class InformacoesPagamentoDTO
 {
     public ContatoDTO contatoParticipante { get; set; }
     public ListarEventosDTO evento { get; set; }
-    public StatusParticipante status { get; set; }
+    public StatusParticipante statusParticipante { get; set; }
+    public StatusPagamento statusPagamento { get; set; }
     public string? stringPix { get; set; }
     public TipoChavePix? tipoChavePix { get; set; }
     public string? chavePix { get; set; }

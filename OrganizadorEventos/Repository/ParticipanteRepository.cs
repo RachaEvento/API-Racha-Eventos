@@ -96,6 +96,7 @@ public class ParticipanteRepository : CrudRepository<Participante>, IParticipant
             .Include(p => p.Contato)
             .ThenInclude(c => c.Usuario)
             .Include(p => p.Evento)
+            .Include(p => p.Pagamento)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 

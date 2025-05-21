@@ -2,8 +2,7 @@ namespace OrganizadorEventos.Enum;
 
 public enum StatusParticipante
 {
-    Recusado,
-    Pendente,
-    Confirmado,
-    Pago
+    Recusado = 0,
+    Pendente = 1,
+    Confirmado = 2
 }

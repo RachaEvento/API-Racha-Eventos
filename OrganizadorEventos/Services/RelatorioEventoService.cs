@@ -74,26 +74,13 @@ public class RelatorioEventoService : IRelatorioEventoService
     {
         if (participante == null || participante.Status != (int)StatusParticipante.Confirmado)
             return null;
-
-        var participantes = await _participanteRepository.GetAllConfirmedByEventIdAsync(participante.EventoId);
-        var participantesPorId = participantes.ToDictionary(p => p.Id, p => 
-        {
-            var dto = p.Contato.ToRequest();
-            dto.Id = p.Id;
-            return dto;
-        });
         
         var custoTotal = 0m;
-        
-        // Busca todos os custos de todos os participantes
-        foreach (var itemParticipante in participantes.Where(p => p.Id == participante.Id))
+        var custos = await _custoService.ListarCustosPorParticipanteAsync(participante.Id);
+        foreach (var custo in custos)
         {
-            var custos = await _custoService.ListarCustosPorParticipanteAsync(itemParticipante.Id);
-            foreach (var custo in custos)
-            {
-                var totalDesseCusto = custo.Valor / custo.ListaCusto.ParticipanteListaCustos.Count;
-                custoTotal += totalDesseCusto;
-            }
+            var totalDesseCusto = custo.Valor / custo.ListaCusto.ParticipanteListaCustos.Count;
+            custoTotal += totalDesseCusto;
         }
 
         return new CustoParticipanteDTO

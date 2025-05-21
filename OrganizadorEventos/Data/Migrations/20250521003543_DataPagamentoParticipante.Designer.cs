@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OrganizadorEventos.Data;
@@ -11,9 +12,11 @@ using OrganizadorEventos.Data;
 namespace OrganizadorEventos.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250521003543_DataPagamentoParticipante")]
+    partial class DataPagamentoParticipante
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -336,9 +339,7 @@ namespace OrganizadorEventos.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("DataPagamento")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("ParticipanteId")
                         .HasColumnType("uuid");
@@ -348,7 +349,8 @@ namespace OrganizadorEventos.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParticipanteId");
+                    b.HasIndex("ParticipanteId")
+                        .IsUnique();
 
                     b.ToTable("PagamentoParticipantes");
                 });
@@ -578,8 +580,8 @@ namespace OrganizadorEventos.Data.Migrations
             modelBuilder.Entity("OrganizadorEventos.Model.PagamentoParticipante", b =>
                 {
                     b.HasOne("OrganizadorEventos.Model.Participante", "Participante")
-                        .WithMany("Pagamento")
-                        .HasForeignKey("ParticipanteId")
+                        .WithOne("Pagamento")
+                        .HasForeignKey("OrganizadorEventos.Model.PagamentoParticipante", "ParticipanteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
