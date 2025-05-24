@@ -1,3 +1,4 @@
+using OrganizadorEventos.Enum;
 using OrganizadorEventos.Model;
 using OrganizadorEventos.Request.Evento;
 
@@ -9,4 +10,5 @@ public interface IEventoService
     Task<Evento> CreateAsync(Evento entity, List<Guid>? contatosParticipantes);
     Task<Evento> GetByIdAsync(Guid eventoId);
     Task UpdateAsync(EditarEventoDTO dto, Guid eventoId);
+    Task UpdateStatusAsync(Evento evento, StatusEvento status);
 }
