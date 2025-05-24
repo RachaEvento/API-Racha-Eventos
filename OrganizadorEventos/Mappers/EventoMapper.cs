@@ -1,4 +1,5 @@
-﻿using OrganizadorEventos.Model;
+﻿using OrganizadorEventos.Enum;
+using OrganizadorEventos.Model;
 using OrganizadorEventos.Request.Evento;
 
 namespace OrganizadorEventos.Mappers;
@@ -36,7 +37,7 @@ public static class EventoMapper
             Descricao = dto.Descricao,
             DataInicio = dto.DataInicio,
             DataFinal = dto.DataFinal,
-            Status = (int)dto.Status
+            Status = (int)StatusEvento.Aberto
         };
     }
 }
