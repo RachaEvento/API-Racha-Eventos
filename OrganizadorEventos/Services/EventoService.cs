@@ -1,3 +1,4 @@
+using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Model;
@@ -7,21 +8,15 @@ namespace OrganizadorEventos.Services;
 
 public class EventoService : IEventoService
 {
-    private readonly IContatoRepository _contatoRepository;
     private readonly IEventoRepository _eventoRepository;
-    private readonly ILocalRepository _localRepository;
     private readonly IParticipanteRepository _participanteRepository;
 
     public EventoService(
         IEventoRepository eventoRepository,
-        IContatoRepository contatoRepository,
-        ILocalRepository localRepository,
         IParticipanteRepository participanteRepository
     )
     {
         _eventoRepository = eventoRepository;
-        _contatoRepository = contatoRepository;
-        _localRepository = localRepository;
         _participanteRepository = participanteRepository;
     }
 
@@ -55,6 +50,12 @@ public class EventoService : IEventoService
         evento.Descricao = dto.Descricao;
         evento.LocalId = dto.LocalId;
 
+        await _eventoRepository.UpdateAsync(evento);
+    }
+
+    public async Task UpdateStatusAsync(Evento evento, StatusEvento status)
+    {
+        evento.Status = (int)status;
         await _eventoRepository.UpdateAsync(evento);
     }
 }

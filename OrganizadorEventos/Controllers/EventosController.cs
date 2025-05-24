@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
 using OrganizadorEventos.Request.Evento;
@@ -46,6 +47,55 @@ public class EventosController : ControllerBase
         var entity = await _eventoService.CreateAsync(dto.ToEntity(userId), dto.ContatosParticipantes);
         return Ok(GenericResponse<ListarEventosDTO>.SucessoResponse(entity.ToRequest(), "Evento criado com sucesso."));
     }
+    
+    [HttpPost("{eventoId}/status/{status}")]
+    [Authorize]
+    public async Task<ActionResult<GenericResponse<CriarEventoDTO>>> AlterarStatusEvento(Guid eventoId, int status)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
+        
+        var evento = await _eventoService.GetByIdAsync(eventoId);
+        if (evento == null)
+            return NotFound(GenericResponse<string>.ErroResponse(new List<string> { "Evento não encontrado." }));
+        
+        StatusEvento novoStatus = (StatusEvento) status;
+        var erros = new List<string>();
+
+        switch ((StatusEvento)evento.Status)
+        {
+            case StatusEvento.Aberto:
+                if (novoStatus != StatusEvento.Fechado && novoStatus != StatusEvento.Cancelado)
+                    erros.Add("Um evento ABERTO só pode ser alterado para FECHADO ou CANCELADO.");
+                break;
+
+            case StatusEvento.Fechado:
+                if (novoStatus != StatusEvento.Finalizado && novoStatus != StatusEvento.Cancelado)
+                    erros.Add("Um evento FECHADO só pode ser alterado para FINALIZADO ou CANCELADO.");
+                break;
+
+            case StatusEvento.Finalizado:
+                erros.Add("Um evento FINALIZADO não pode ter seu status alterado.");
+                break;
+
+            case StatusEvento.Cancelado:
+                erros.Add("Um evento CANCELADO não pode ter seu status alterado.");
+                break;
+
+            default:
+                erros.Add("Status atual inválido.");
+                break;
+        }
+
+        if (erros.Any())
+        {
+            return BadRequest(GenericResponse<List<string>>.ErroResponse(erros, "Erro ao alterar status do evento."));
+        }
+        
+        await _eventoService.UpdateStatusAsync(evento, novoStatus);
+        return Ok(GenericResponse<string>.SucessoResponse("", "Status do evento alterado com sucesso."));
+    }
 
     [HttpGet("{id}")]
     [Authorize]
@@ -67,7 +117,7 @@ public class EventosController : ControllerBase
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-
+        
         await _eventoService.UpdateAsync(dto, id);
         return Ok(GenericResponse<string>.SucessoResponse("", "Evento atualizado com sucesso."));
     }
