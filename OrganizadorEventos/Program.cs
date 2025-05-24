@@ -95,6 +95,8 @@ builder.Services.AddScoped<IRelatorioEventoService, RelatorioEventoService>();
 builder.Services.AddScoped<IPixService, PixService>();
 builder.Services.AddScoped<IGoogleDriveService, GoogleDriveService>();
 builder.Services.AddScoped<IPagamentoParticipanteRepository, PagamentoParticipanteRepository>();
+builder.Services.AddScoped<IConviteService, ConviteService>();
+builder.Services.AddScoped<IPagamentoService, PagamentoService>();
 builder.Services.AddHttpClient();
 
 builder.Services.RegisterJWT(builder.Configuration);

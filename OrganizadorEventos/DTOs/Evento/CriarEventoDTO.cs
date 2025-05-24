@@ -8,7 +8,6 @@ public class CriarEventoDTO
     public string? Descricao { get; set; }
     public DateTime DataInicio { get; set; }
     public DateTime? DataFinal { get; set; }
-    public StatusEvento Status { get; set; }
     public Guid? LocalId { get; set; }
     public List<Guid>? ContatosParticipantes { get; set; }
 }
