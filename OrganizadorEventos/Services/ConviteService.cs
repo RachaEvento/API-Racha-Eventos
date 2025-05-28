@@ -116,7 +116,6 @@ public class ConviteService : IConviteService
         {
             contatoParticipante = participante.ToRequest(),
             evento = participante.Evento.ToRequest(),
-            status = (StatusParticipante)participante.Status
         };
     }
 }
