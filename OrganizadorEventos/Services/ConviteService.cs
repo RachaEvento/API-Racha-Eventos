@@ -88,11 +88,8 @@ public class ConviteService : IConviteService
         if (participante == null)
             throw new Exception("Participante não encontrado.");
 
-        if (participante.Status == (int)StatusParticipante.Pendente)
-        {
-            participante.Status = (int)StatusParticipante.Confirmado;
-            await _participanteRepository.UpdateAsync(participante);
-        }
+        participante.Status = (int)StatusParticipante.Confirmado;
+        await _participanteRepository.UpdateAsync(participante);
     }
 
     public async Task RecusarParticipante(Guid participanteId)
@@ -101,11 +98,8 @@ public class ConviteService : IConviteService
         if (participante == null)
             throw new Exception("Participante não encontrado.");
         
-        if (participante.Status == (int)StatusParticipante.Pendente)
-        {
-            participante.Status = (int)StatusParticipante.Recusado;
-            await _participanteRepository.UpdateAsync(participante);
-        }
+        participante.Status = (int)StatusParticipante.Recusado;
+        await _participanteRepository.UpdateAsync(participante);
     }
 
     public async Task<ConviteParticipanteDTO> ConviteParticipante(Guid participanteId)
