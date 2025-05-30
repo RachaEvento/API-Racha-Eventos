@@ -21,11 +21,11 @@ public class ConviteService : IConviteService
         _eventoRepository = eventoRepository;
     }
     
-    public async Task ConvidarTodosParticipantesEvento(Guid eventoId)
+    public async Task ConvidarTodosParticipantesPendentesEvento(Guid eventoId)
     {
         var evento = await _eventoRepository.GetByIdAsync(eventoId);
         var usuario = evento.Usuario;
-        var participantes = evento.Participantes.Select(p => p.Contato).ToList();
+        var participantes = evento.Participantes.Where(p => p.Status == (int)StatusParticipante.Pendente).Select(p => p.Contato).ToList();
         
         _ = Task.Run(async () =>
         {
