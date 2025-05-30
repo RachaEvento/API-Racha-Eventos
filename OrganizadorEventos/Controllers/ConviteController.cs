@@ -40,8 +40,15 @@ public class ConviteController : ControllerBase
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
 
-        await _conviteService.ConvidarParticipante(ParticipanteId);
-        return Ok(GenericResponse<string>.SucessoResponse("","Email encaminhados"));
+        try
+        {
+            await _conviteService.ConvidarParticipante(ParticipanteId);
+            return Ok(GenericResponse<string>.SucessoResponse("", "Email encaminhados"));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(GenericResponse<string>.ErroResponse(new List<string>(), "Erro ao encaminhar o email!"));
+        }
     }
     
     #endregion 

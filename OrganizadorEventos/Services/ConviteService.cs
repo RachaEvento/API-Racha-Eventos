@@ -40,11 +40,12 @@ public class ConviteService : IConviteService
                     EventoData = evento.DataInicio,
                     CodigoConfirmacao = participante.Id.ToString()
                 };
-
+                
                 try
                 {
                     await _emailService.SendInvitationEmailAsync(convite);
                     System.Diagnostics.Debug.WriteLine($"Enviado: {participante.Email}");
+                    await ParticipantePendente(participante.Id);
                 }
                 catch (Exception ex)
                 {
@@ -75,11 +76,23 @@ public class ConviteService : IConviteService
         {
             await _emailService.SendInvitationEmailAsync(convite);
             System.Diagnostics.Debug.WriteLine($"Enviado: {contato.Email}");
+            await ParticipantePendente(participante.Id);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Failed to send invitation to {contato.Email}, error: {ex.Message}");
+            throw;
         }
+    }
+    
+    private async Task ParticipantePendente(Guid participanteId)
+    {
+        var participante = await _participanteRepository.GetByIdAsync(participanteId);
+        if (participante == null)
+            throw new Exception("Participante não encontrado.");
+
+        participante.Status = (int)StatusParticipante.Pendente;
+        await _participanteRepository.UpdateAsync(participante);
     }
 
     public async Task ConfirmarParticipante(Guid participanteId)
