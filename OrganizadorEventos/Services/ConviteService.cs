@@ -25,7 +25,7 @@ public class ConviteService : IConviteService
     {
         var evento = await _eventoRepository.GetByIdAsync(eventoId);
         var usuario = evento.Usuario;
-        var participantes = evento.Participantes.Where(p => p.Status == (int)StatusParticipante.Pendente).Select(p => p.Contato).ToList();
+        var participantes = evento.Participantes.Where(p => p.Status == (int)StatusParticipante.Pendente).Select(p => p.ToRequest()).ToList();
         
         _ = Task.Run(async () =>
         {
@@ -45,7 +45,6 @@ public class ConviteService : IConviteService
                 {
                     await _emailService.SendInvitationEmailAsync(convite);
                     System.Diagnostics.Debug.WriteLine($"Enviado: {participante.Email}");
-                    await ParticipantePendente(participante.Id);
                 }
                 catch (Exception ex)
                 {
