@@ -18,6 +18,22 @@ public class ContatosController : ControllerBase
     {
         _contatoService = contatoService;
     }
+    
+    [HttpGet("disponiveis/{eventoId}")]
+    [Authorize]
+    public async Task<ActionResult<GenericResponse<IEnumerable<ContatoDTO>>>> GetAllByEvento(Guid eventoId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
+
+        var contatos = await _contatoService.GetAllByUserAndEventoAsync(userId, eventoId);
+        var contatoRequests = contatos.Select(c => c.ToRequest()).ToList();
+
+        return Ok(GenericResponse<IEnumerable<ContatoDTO>>.SucessoResponse(contatoRequests,
+            "Contatos carregados com sucesso."));
+    }
 
     [HttpGet]
     [Authorize]

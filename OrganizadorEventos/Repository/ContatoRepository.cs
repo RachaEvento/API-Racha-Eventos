@@ -18,4 +18,12 @@ public class ContatoRepository : CrudRepository<Contato>, IContatoRepository
     {
         return _dbSet.Where(c => c.UsuarioId == usuarioId).ToListAsync();
     }
+
+    public Task<List<Contato>> GetAllByUserAndEventoAsync(Guid usuarioId, Guid eventoId)
+    {
+        return _dbSet
+            .Where(c => c.UsuarioId == usuarioId &&
+                        !_context.Participantes.Any(p => p.EventoId == eventoId && p.ContatoId == c.Id))
+            .ToListAsync();
+    }
 }
