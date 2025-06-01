@@ -74,14 +74,15 @@ public class PagamentoService : IPagamentoService
         {
             dataPagamento = p.DataPagamento,
             pagamentoId = p.Id,
-            statusPagamento = (StatusPagamento)p.Status
+            statusPagamento = (StatusPagamento)p.Status,
+            comprovante = p.Comprovante
         }).ToList();
         
         return new ListaPagamentosDTO()
         {
             participante = participante.ToRequest(),
             statusParticipante = (StatusParticipante)participante.Status,
-            valor = custoParticipante.Custo,
+            valor = custoParticipante?.Custo,
             pagamentos = listaPagamentos
         };
     }

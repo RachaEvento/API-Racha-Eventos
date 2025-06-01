@@ -70,8 +70,18 @@ public class PagamentoController : ControllerBase
     {
         try
         {
-            var fileId = await _googleDriveService.UploadFileAsync(file);
-            await _pagamentoService.SalvarPagamento(ParticipanteId, fileId);
+            //var fileId = await _googleDriveService.UploadFileAsync(file); Desabilitado porque estava causando problemas
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Arquivo não enviado.");
+            }
+
+            using var memoryStream = new MemoryStream();
+            await file.CopyToAsync(memoryStream);
+            var fileBytes = memoryStream.ToArray();
+            var base64String = Convert.ToBase64String(fileBytes);
+
+            await _pagamentoService.SalvarPagamento(ParticipanteId, base64String);
 
             return Ok(GenericResponse<string>.SucessoResponse("", "Pagamento enviado para avaliação."));
         }

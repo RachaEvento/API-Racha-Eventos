@@ -16,4 +16,5 @@ public class PagamentosDTO
     public DateTime dataPagamento { get; set; }
     
     public StatusPagamento statusPagamento { get; set; }
+    public string comprovante { get; set; }
 }
