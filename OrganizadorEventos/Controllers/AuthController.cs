@@ -56,6 +56,7 @@ public class AuthController : ControllerBase
                 "Erro ao registrar usuário."));
         }
     }
+
     [Authorize]
     [HttpPatch("atualizar")]
     public async Task<IActionResult> AtualizarUsuario([FromBody] UpdateUsuarioDTO updateDto)
@@ -63,14 +64,11 @@ public class AuthController : ControllerBase
         var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier);
 
         if (userIdClaim == null)
-        {
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não autenticado." }));
-        }
 
-        if (!Guid.TryParse(userIdClaim.Value, out Guid userId))
-        {
-            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "ID de usuário inválido no token." }));
-        }
+        if (!Guid.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string>
+                { "ID de usuário inválido no token." }));
 
         try
         {
@@ -79,10 +77,28 @@ public class AuthController : ControllerBase
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(GenericResponse<string>.ErroResponse(new List<string> { ex.Message }, "Erro ao atualizar usuário."));
+            return BadRequest(GenericResponse<string>.ErroResponse(new List<string> { ex.Message },
+                "Erro ao atualizar usuário."));
         }
     }
 
+    [Authorize]
+    [HttpGet("usuario")]
+    public async Task<IActionResult> ObterUsuario()
+    {
+        var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier);
 
+        if (userIdClaim == null)
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não autenticado." }));
 
+        if (!Guid.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string>
+                { "ID de usuário inválido no token." }));
+
+        var user = await _authService.ObterUsuarioPorIdAsync(userId);
+        if (user == null)
+            return NotFound(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
+
+        return Ok(GenericResponse<object>.SucessoResponse(user, "Dados do usuário obtidos com sucesso."));
+    }
 }

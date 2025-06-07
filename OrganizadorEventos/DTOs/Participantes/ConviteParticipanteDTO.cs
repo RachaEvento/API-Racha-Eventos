@@ -1,6 +1,4 @@
-﻿using OrganizadorEventos.Enum;
-using OrganizadorEventos.Request;
-using OrganizadorEventos.Request.Evento;
+﻿using OrganizadorEventos.Request.Evento;
 
 namespace OrganizadorEventos.DTOs.Participantes;
 

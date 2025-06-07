@@ -13,8 +13,9 @@ public class PixService : IPixService
     {
         _httpClient = httpClient;
     }
-    
-    public async Task<string> GeneratePixQrCodeAsync(string pixKey, string receiverName, string city, decimal amount, string? message, string? transactionId)
+
+    public async Task<string> GeneratePixQrCodeAsync(string pixKey, string receiverName, string city, decimal amount,
+        string? message, string? transactionId)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "https://www.invertexto.com/qrcode-pix/generate.php");
 
@@ -34,7 +35,7 @@ public class PixService : IPixService
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
-        PixResponse result = JsonConvert.DeserializeObject<PixResponse>(json);
+        var result = JsonConvert.DeserializeObject<PixResponse>(json);
 
         return result.payload;
     }

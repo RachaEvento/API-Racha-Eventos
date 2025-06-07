@@ -1,7 +1,6 @@
 ﻿using OrganizadorEventos.DTOs.Participantes;
 using OrganizadorEventos.Enum;
 using OrganizadorEventos.Model;
-using OrganizadorEventos.Request;
 
 namespace OrganizadorEventos.Mappers;
 

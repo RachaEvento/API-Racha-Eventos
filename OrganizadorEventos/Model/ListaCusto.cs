@@ -9,5 +9,6 @@ public class ListaCusto
     public Evento Evento { get; set; } = null!;
     public ICollection<Custo> Custos { get; set; } = new List<Custo>();
 
-    public ICollection<ParticipanteListaCusto> ParticipanteListaCustos { get; set; } = new List<ParticipanteListaCusto>();
+    public ICollection<ParticipanteListaCusto> ParticipanteListaCustos { get; set; } =
+        new List<ParticipanteListaCusto>();
 }

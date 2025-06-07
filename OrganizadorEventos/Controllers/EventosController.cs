@@ -47,7 +47,7 @@ public class EventosController : ControllerBase
         var entity = await _eventoService.CreateAsync(dto.ToEntity(userId), dto.ContatosParticipantes);
         return Ok(GenericResponse<ListarEventosDTO>.SucessoResponse(entity.ToRequest(), "Evento criado com sucesso."));
     }
-    
+
     [HttpPost("{eventoId}/status/{status}")]
     [Authorize]
     public async Task<ActionResult<GenericResponse<CriarEventoDTO>>> AlterarStatusEvento(Guid eventoId, int status)
@@ -55,12 +55,12 @@ public class EventosController : ControllerBase
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-        
+
         var evento = await _eventoService.GetByIdAsync(eventoId);
         if (evento == null)
             return NotFound(GenericResponse<string>.ErroResponse(new List<string> { "Evento não encontrado." }));
-        
-        StatusEvento novoStatus = (StatusEvento) status;
+
+        var novoStatus = (StatusEvento)status;
         var erros = new List<string>();
 
         switch ((StatusEvento)evento.Status)
@@ -89,10 +89,8 @@ public class EventosController : ControllerBase
         }
 
         if (erros.Any())
-        {
             return BadRequest(GenericResponse<List<string>>.ErroResponse(erros, "Erro ao alterar status do evento."));
-        }
-        
+
         await _eventoService.UpdateStatusAsync(evento, novoStatus);
         return Ok(GenericResponse<string>.SucessoResponse("", "Status do evento alterado com sucesso."));
     }
@@ -117,7 +115,7 @@ public class EventosController : ControllerBase
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-        
+
         await _eventoService.UpdateAsync(dto, id);
         return Ok(GenericResponse<string>.SucessoResponse("", "Evento atualizado com sucesso."));
     }

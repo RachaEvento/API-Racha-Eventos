@@ -1,6 +1,4 @@
-﻿using OrganizadorEventos.Enum;
-
-namespace OrganizadorEventos.Request.Evento;
+﻿namespace OrganizadorEventos.Request.Evento;
 
 public class CriarEventoDTO
 {

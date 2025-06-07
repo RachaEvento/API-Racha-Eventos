@@ -18,7 +18,7 @@ public class ContatosController : ControllerBase
     {
         _contatoService = contatoService;
     }
-    
+
     [HttpGet("disponiveis/{eventoId}")]
     [Authorize]
     public async Task<ActionResult<GenericResponse<IEnumerable<ContatoDTO>>>> GetAllByEvento(Guid eventoId)

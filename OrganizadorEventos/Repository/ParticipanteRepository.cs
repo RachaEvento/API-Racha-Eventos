@@ -90,7 +90,7 @@ public class ParticipanteRepository : CrudRepository<Participante>, IParticipant
             .Include(p => p.Pagamento)
             .ToListAsync();
     }
-    
+
     public async Task<Participante> GetByIdAsync(Guid id)
     {
         return await _dbSet
