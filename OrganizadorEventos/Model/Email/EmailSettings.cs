@@ -1,4 +1,5 @@
 ﻿namespace OrganizadorEventos.Model;
+
 public class EmailSettings
 {
     public string SmtpServer { get; set; }

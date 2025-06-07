@@ -15,26 +15,26 @@ public class EmailService : IEmailService
     {
         _emailSettings = emailSettings.Value;
     }
-    
+
     public async Task SendInvitationEmailAsync(ConviteEmailDTO convite)
     {
         var mailMessage = new MailMessage
         {
             From = new MailAddress(_emailSettings.Username),
             Subject = $"Convite para {convite.EventoNome}",
-            IsBodyHtml = true,
+            IsBodyHtml = true
         };
-        
+
         mailMessage.To.Add(convite.ToEmail);
 
-        string body = GetEmailBody(
-            convite.ConvidadoNome, 
-            convite.QuemConvidaNome, 
-            convite.EventoNome, 
-            convite.EventoData, 
+        var body = GetEmailBody(
+            convite.ConvidadoNome,
+            convite.QuemConvidaNome,
+            convite.EventoNome,
+            convite.EventoData,
             $"{_emailSettings.ConvidarUrl}/{convite.CodigoConfirmacao}");
 
-        AlternateView avHtml = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
+        var avHtml = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
 
         mailMessage.AlternateViews.Add(avHtml);
 
@@ -42,19 +42,19 @@ public class EmailService : IEmailService
         {
             smtpClient.Credentials = new NetworkCredential(_emailSettings.Username, _emailSettings.Password);
             smtpClient.EnableSsl = _emailSettings.EnableSsl;
-            
+
             await smtpClient.SendMailAsync(mailMessage);
         }
     }
-    
+
     private string GetEmailBody(
-      string convidadoNome,
-      string quemConvidaNome,
-      string eventoNome,
-      DateTime eventoData,
-      string linkConfirmacao)
+        string convidadoNome,
+        string quemConvidaNome,
+        string eventoNome,
+        DateTime eventoData,
+        string linkConfirmacao)
     {
-      return $@"<!DOCTYPE html>
+        return $@"<!DOCTYPE html>
       <html>
       <head>
         <meta http-equiv=""Content-Type"" content=""text/html; charset=UTF-8""/>

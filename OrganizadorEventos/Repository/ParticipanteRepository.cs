@@ -89,7 +89,7 @@ public class ParticipanteRepository : CrudRepository<Participante>, IParticipant
             .Include(p => p.Contato) // Eager load Contato
             .ToListAsync();
     }
-    
+
     public async Task<Participante> GetByIdAsync(Guid id)
     {
         return await _dbSet

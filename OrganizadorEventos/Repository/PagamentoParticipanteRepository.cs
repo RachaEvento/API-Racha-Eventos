@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrganizadorEventos.Data;
-using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Model;
 
 namespace OrganizadorEventos.Repository;
 
-public class PagamentoParticipanteRepository: CrudRepository<PagamentoParticipante>, IPagamentoParticipanteRepository
+public class PagamentoParticipanteRepository : CrudRepository<PagamentoParticipante>, IPagamentoParticipanteRepository
 {
     private readonly AppDbContext _context;
     protected readonly DbSet<PagamentoParticipante> _dbSet;
-    
+
     public PagamentoParticipanteRepository(AppDbContext context) : base(context)
     {
         _context = context;
@@ -21,5 +20,4 @@ public class PagamentoParticipanteRepository: CrudRepository<PagamentoParticipan
     {
         return await _dbSet.Where(pp => pp.ParticipanteId == participanteId).ToListAsync();
     }
-    
 }

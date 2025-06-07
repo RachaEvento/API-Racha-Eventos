@@ -9,7 +9,7 @@ public class CustoRepository : CrudRepository<Custo>, ICustoRepository
 {
     private readonly AppDbContext _context;
 
-    public CustoRepository(AppDbContext context): base(context)
+    public CustoRepository(AppDbContext context) : base(context)
     {
         _context = context;
     }

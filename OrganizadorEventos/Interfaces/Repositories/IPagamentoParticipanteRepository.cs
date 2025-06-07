@@ -1,5 +1,4 @@
-﻿using OrganizadorEventos.Enum;
-using OrganizadorEventos.Model;
+﻿using OrganizadorEventos.Model;
 
 namespace OrganizadorEventos.Interfaces.Repositories;
 

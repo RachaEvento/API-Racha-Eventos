@@ -17,9 +17,9 @@ public class ConviteController : ControllerBase
     {
         _conviteService = conviteService;
     }
-    
+
     #region Endpoints de gerência do organizador
-    
+
     [HttpPost("evento/{EventoId}/convidar/todos")]
     [Authorize]
     public async Task<IActionResult> ConvidarParticipantesEvento(Guid EventoId)
@@ -29,9 +29,9 @@ public class ConviteController : ControllerBase
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
 
         await _conviteService.ConvidarTodosParticipantesPendentesEvento(EventoId);
-        return Ok(GenericResponse<string>.SucessoResponse("","Emails encaminhados"));
+        return Ok(GenericResponse<string>.SucessoResponse("", "Emails encaminhados"));
     }
-    
+
     [HttpPost("evento/{EventoId}/convidar/{ParticipanteId}")]
     [Authorize]
     public async Task<IActionResult> ConvidarParticipanteEvento(Guid EventoId, Guid ParticipanteId)
@@ -50,31 +50,31 @@ public class ConviteController : ControllerBase
             return BadRequest(GenericResponse<string>.ErroResponse(new List<string>(), "Erro ao encaminhar o email!"));
         }
     }
-    
-    #endregion 
-    
+
+    #endregion
+
     #region Endpoints de acesso público
-    
+
     [HttpPost("{ParticipanteId}/confirmar")]
     public async Task<IActionResult> ConfirmarParticipante(Guid ParticipanteId)
     {
         await _conviteService.ConfirmarParticipante(ParticipanteId);
-        return Ok(GenericResponse<string>.SucessoResponse("","Participante confirmado."));
+        return Ok(GenericResponse<string>.SucessoResponse("", "Participante confirmado."));
     }
-    
+
     [HttpPost("{ParticipanteId}/recusar")]
     public async Task<IActionResult> RecusarParticipante(Guid ParticipanteId)
     {
         await _conviteService.RecusarParticipante(ParticipanteId);
-        return Ok(GenericResponse<string>.SucessoResponse("","Participante recusado."));
+        return Ok(GenericResponse<string>.SucessoResponse("", "Participante recusado."));
     }
-    
+
     [HttpGet("{ParticipanteId}/convite")]
     public async Task<IActionResult> ConviteParticipante(Guid ParticipanteId)
     {
         var convite = await _conviteService.ConviteParticipante(ParticipanteId);
-        return Ok(GenericResponse<ConviteParticipanteDTO>.SucessoResponse(convite,"Convite recuperado com sucesso."));
+        return Ok(GenericResponse<ConviteParticipanteDTO>.SucessoResponse(convite, "Convite recuperado com sucesso."));
     }
-    
+
     #endregion
 }
