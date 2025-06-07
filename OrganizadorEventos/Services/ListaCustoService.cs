@@ -1,12 +1,9 @@
-using OrganizadorEventos.DTOs.Custos;
 using OrganizadorEventos.DTOs.ListaCusto;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
-using OrganizadorEventos.Mappers;
 using OrganizadorEventos.Model;
 using OrganizadorEventos.Request;
 using OrganizadorEventos.Request.Evento;
-using OrganizadorEventos.Response;
 
 namespace OrganizadorEventos.Services;
 
@@ -35,10 +32,12 @@ public class ListaCustoService : IListaCustoService
 
         return "Lista de custo criada com sucesso.";
     }
-    public async Task<List<ListaCustosComCustosEParticipantesDto>> ListarListaCustosComCustosEParticipantesAsync(Guid eventoId)
+
+    public async Task<List<ListaCustosComCustosEParticipantesDto>> ListarListaCustosComCustosEParticipantesAsync(
+        Guid eventoId)
     {
         var eventos = await _listaCustoRepository.ObterTodosComCustosAsync(eventoId);
-        
+
         return eventos.Select(lc => new ListaCustosComCustosEParticipantesDto
         {
             Id = lc.Id,
@@ -59,5 +58,4 @@ public class ListaCustoService : IListaCustoService
             }).ToList()
         }).ToList();
     }
-
 }

@@ -22,15 +22,15 @@ public class RelatorioEventoService : IRelatorioEventoService
     public async Task<List<CustoParticipanteDTO>> CalcularCustoParticipantesAsync(Guid eventoId)
     {
         var participantes = await _participanteRepository.GetAllConfirmedByEventIdAsync(eventoId);
-        var participantesPorId = participantes.ToDictionary(p => p.Id, p => 
+        var participantesPorId = participantes.ToDictionary(p => p.Id, p =>
         {
             var dto = p.Contato.ToRequest();
             dto.Id = p.Id;
             return dto;
         });
-        
+
         var custosPorParticipante = new Dictionary<Guid, List<Guid>>();
-        
+
         // Busca todos os custos de todos os participantes
         foreach (var participante in participantes)
         {
@@ -55,9 +55,7 @@ public class RelatorioEventoService : IRelatorioEventoService
             var valorPorParticipante = custo.Valor / listaParticipantes.Count;
 
             foreach (var participanteId in listaParticipantes)
-            {
                 custoAcumuladoPorParticipante[participanteId] += valorPorParticipante;
-            }
         }
 
         // Monta a lista de retorno
@@ -74,7 +72,7 @@ public class RelatorioEventoService : IRelatorioEventoService
     {
         if (participante == null || participante.Status != (int)StatusParticipante.Confirmado)
             return null;
-        
+
         var custoTotal = 0m;
         var custos = await _custoService.ListarCustosPorParticipanteAsync(participante.Id);
         foreach (var custo in custos)

@@ -13,8 +13,9 @@ namespace OrganizadorEventos.Controllers;
 [ApiController]
 public class RelatorioController : ControllerBase
 {
-    private readonly IRelatorioEventoService _relatorioEventoService;
     private readonly IPixService _pixService;
+    private readonly IRelatorioEventoService _relatorioEventoService;
+
     public RelatorioController(IRelatorioEventoService relatorioEventoService, IPixService pixService)
     {
         _relatorioEventoService = relatorioEventoService;
@@ -39,16 +40,17 @@ public class RelatorioController : ControllerBase
         }
         catch (Exception ex)
         {
-            return NotFound(GenericResponse<string>.ErroResponse(new List<string> {ex.Message},"Erro ao calcular custos."));
-        } 
+            return NotFound(GenericResponse<string>.ErroResponse(new List<string> { ex.Message },
+                "Erro ao calcular custos."));
+        }
     }
-    
+
     [HttpPost("generate-pix")]
     public async Task<IActionResult> GetPixQRCode([FromBody] PixRequest request)
     {
         try
         {
-            string payload = await _pixService.GeneratePixQrCodeAsync(
+            var payload = await _pixService.GeneratePixQrCodeAsync(
                 request.PixKey,
                 request.ReceiverName,
                 request.City,
@@ -56,13 +58,13 @@ public class RelatorioController : ControllerBase
                 request.Message,
                 request.TransactionId
             );
-            
-            return Ok(new { qrcodestring = "https://dyn-qrcode.vercel.app/api?url="+payload });
+
+            return Ok(new { qrcodestring = "https://dyn-qrcode.vercel.app/api?url=" + payload });
         }
         catch (Exception ex)
         {
             Debug.Write(ex.Message);
             return Ok(new { qrCodeBase64 = string.Empty });
-        } 
+        }
     }
 }

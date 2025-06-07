@@ -1,11 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OrganizadorEventos.DTOs.Email;
 using OrganizadorEventos.DTOs.Participantes;
-using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces.Services;
-using OrganizadorEventos.Request;
 using OrganizadorEventos.Response;
 
 namespace OrganizadorEventos.Controllers;
@@ -20,7 +17,7 @@ public class ParticipantesController : ControllerBase
     {
         _participanteService = participanteService;
     }
-    
+
     [HttpGet("evento/{EventoId}")]
     [Authorize]
     public async Task<IActionResult> ListParticipants(Guid EventoId)
@@ -33,7 +30,7 @@ public class ParticipantesController : ControllerBase
         return Ok(GenericResponse<List<ParticipanteDTO>>.SucessoResponse(participantes,
             "Participantes recuperados com sucesso."));
     }
-    
+
     [HttpPost("evento/{EventoId}/adicionar")]
     [Authorize]
     public async Task<IActionResult> AddParticipants(Guid EventoId, [FromBody] AdicionarParticipanteDTO contatos)
@@ -41,11 +38,11 @@ public class ParticipantesController : ControllerBase
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
-        
+
         await _participanteService.AdicionarContatosComoParticipantesAsync(contatos, EventoId);
-        return Ok(GenericResponse<string>.SucessoResponse("","Participantes adicionados com sucesso."));
+        return Ok(GenericResponse<string>.SucessoResponse("", "Participantes adicionados com sucesso."));
     }
-    
+
     [HttpPost("evento/{EventoId}/remover")]
     [Authorize]
     public async Task<IActionResult> RemoveParticipants(Guid EventoId, [FromBody] RemoverParticipanteDTO participantes)

@@ -9,13 +9,15 @@ namespace OrganizadorEventos.Services;
 
 public class PagamentoService : IPagamentoService
 {
-    private readonly IRelatorioEventoService _relatorioEventoService;
-    private readonly IPixService _pixService;
-    private readonly IPagamentoParticipanteRepository _pagamentoParticipanteRepository;    
+    private readonly IPagamentoParticipanteRepository _pagamentoParticipanteRepository;
     private readonly IParticipanteRepository _participanteRepository;
+    private readonly IPixService _pixService;
+    private readonly IRelatorioEventoService _relatorioEventoService;
 
 
-    public PagamentoService(IRelatorioEventoService relatorioEventoService, IPixService pixService, IPagamentoParticipanteRepository pagamentoParticipanteRepository, IParticipanteRepository participanteRepository)
+    public PagamentoService(IRelatorioEventoService relatorioEventoService, IPixService pixService,
+        IPagamentoParticipanteRepository pagamentoParticipanteRepository,
+        IParticipanteRepository participanteRepository)
     {
         _relatorioEventoService = relatorioEventoService;
         _pixService = pixService;
@@ -27,17 +29,18 @@ public class PagamentoService : IPagamentoService
     {
         var participante = await _participanteRepository.GetByIdAsync(participanteId);
         var custoParticipante = await _relatorioEventoService.CalcularCustoParticipanteAsync(participante);
-        
+
         var usuario = participante.Evento.Usuario;
-        
+
         var nomeLimpo = participante.Contato.Nome.Replace(" ", "");
         var nomeSeguro = nomeLimpo.Substring(0, Math.Min(15, nomeLimpo.Length)).ToUpper();
-        var pix = await _pixService.GeneratePixQrCodeAsync(usuario.ChavePix, usuario.UserName, "Criciúma", custoParticipante.Custo, participante.Evento.Nome, $"PGT{nomeSeguro}");
+        var pix = await _pixService.GeneratePixQrCodeAsync(usuario.ChavePix, usuario.UserName, "Criciúma",
+            custoParticipante.Custo, participante.Evento.Nome, $"PGT{nomeSeguro}");
 
         var pagamentos = participante.Pagamento?.OrderByDescending(pag => pag.DataPagamento);
         var statusPagamento = (StatusPagamento?)pagamentos?.FirstOrDefault()?.Status ?? StatusPagamento.Pendente;
 
-        return new InformacoesPagamentoDTO()
+        return new InformacoesPagamentoDTO
         {
             contatoParticipante = custoParticipante.Participante,
             evento = participante.Evento.ToRequest(),
@@ -46,13 +49,13 @@ public class PagamentoService : IPagamentoService
             stringPix = pix,
             tipoChavePix = usuario.TipoChavePix,
             chavePix = usuario.ChavePix,
-            valor = custoParticipante.Custo,
+            valor = custoParticipante.Custo
         };
     }
 
     public async Task SalvarPagamento(Guid participanteId, string fileId)
     {
-        var pagamento = new PagamentoParticipante()
+        var pagamento = new PagamentoParticipante
         {
             Id = Guid.NewGuid(),
             ParticipanteId = participanteId,
@@ -69,7 +72,7 @@ public class PagamentoService : IPagamentoService
         var participante = await _participanteRepository.GetByIdAsync(participanteId);
         var custoParticipante = await _relatorioEventoService.CalcularCustoParticipanteAsync(participante);
         var pagamentos = await _pagamentoParticipanteRepository.GetAllByParticipanteIdAsync(participanteId);
-        
+
         var listaPagamentos = pagamentos.Select(p => new PagamentosDTO
         {
             dataPagamento = p.DataPagamento,
@@ -77,8 +80,8 @@ public class PagamentoService : IPagamentoService
             statusPagamento = (StatusPagamento)p.Status,
             comprovante = p.Comprovante
         }).ToList();
-        
-        return new ListaPagamentosDTO()
+
+        return new ListaPagamentosDTO
         {
             participante = participante.ToRequest(),
             statusParticipante = (StatusParticipante)participante.Status,

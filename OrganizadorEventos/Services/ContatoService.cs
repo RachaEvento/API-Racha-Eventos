@@ -20,7 +20,6 @@ public class ContatoService : CrudService<Contato>, IContatoService
 
     public async Task<List<Contato>> GetAllByUserAndEventoAsync(Guid userId, Guid eventoId)
     {
-        
         return await _contatoRepository.GetAllByUserAndEventoAsync(userId, eventoId);
     }
 }
