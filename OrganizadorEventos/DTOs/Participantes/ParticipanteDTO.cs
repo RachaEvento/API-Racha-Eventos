@@ -9,5 +9,5 @@ public class ParticipanteDTO
     public string Email { get; set; } = null!;
     public string Telefone { get; set; } = null!;
     public StatusParticipante Status { get; set; }
-    public bool Ativo { get; set; }
+    public StatusPagamento Pago { get; set; }
 }

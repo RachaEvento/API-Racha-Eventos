@@ -87,6 +87,7 @@ public class ParticipanteRepository : CrudRepository<Participante>, IParticipant
         return await _dbSet
             .Where(p => p.EventoId == eventoId)
             .Include(p => p.Contato) // Eager load Contato
+            .Include(p => p.Pagamento)
             .ToListAsync();
     }
     
@@ -106,5 +107,32 @@ public class ParticipanteRepository : CrudRepository<Participante>, IParticipant
             .Where(p => p.EventoId == eventoId && p.Status == (int)StatusParticipante.Confirmado)
             .Include(p => p.Contato) // Eager load Contato
             .ToListAsync();
+    }
+
+    public async Task UpdateAllNonConfirmedToDeniedByEventAsync(Guid eventoId)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var participantes = await _dbSet
+                .Where(p => p.EventoId == eventoId && p.Status != (int)StatusParticipante.Confirmado)
+                .ToListAsync();
+
+            if (participantes.Any())
+            {
+                foreach (var participante in participantes)
+                {
+                    participante.Status = (int)StatusParticipante.Recusado;
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            throw new Exception("Ocorreu um erro ao atualizar os participantes para recusado.", ex);
+        }
     }
 }

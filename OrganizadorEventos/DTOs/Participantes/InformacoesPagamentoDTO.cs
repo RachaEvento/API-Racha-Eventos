@@ -6,7 +6,7 @@ namespace OrganizadorEventos.DTOs.Participantes;
 
 public class InformacoesPagamentoDTO
 {
-    public ContatoDTO contatoParticipante { get; set; }
+    public ParticipanteDTO contatoParticipante { get; set; }
     public ListarEventosDTO evento { get; set; }
     public StatusParticipante statusParticipante { get; set; }
     public StatusPagamento statusPagamento { get; set; }

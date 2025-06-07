@@ -9,4 +9,7 @@ public interface IPagamentoService
     Task SalvarPagamento(Guid participanteId, string fileId);
     Task<ListaPagamentosDTO> ListarPagamentoParticipante(Guid participanteId);
     Task AlterarPagamentoParticipante(Guid pagamentoId, StatusPagamento status);
+    Task CobrarTodosPagamentosPendentesEventos(Guid eventoId);
+    Task CobrarParticipanteEvento(Guid participanteId);
+    
 }

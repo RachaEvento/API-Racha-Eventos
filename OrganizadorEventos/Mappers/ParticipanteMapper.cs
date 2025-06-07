@@ -15,7 +15,7 @@ public static class ParticipanteMapper
             Nome = entity.Contato.Nome,
             Email = entity.Contato.Email,
             Telefone = entity.Contato.Telefone,
-            Ativo = entity.Contato.Ativo,
+            Pago = (StatusPagamento?)entity.Pagamento?.OrderByDescending(x => x.DataPagamento).FirstOrDefault()?.Status ?? StatusPagamento.Pendente,
             Status = (StatusParticipante)entity.Status
         };
     }

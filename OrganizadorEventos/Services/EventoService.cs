@@ -55,7 +55,13 @@ public class EventoService : IEventoService
 
     public async Task UpdateStatusAsync(Evento evento, StatusEvento status)
     {
+        if (status == StatusEvento.Fechado)
+        {
+            await _participanteRepository.UpdateAllNonConfirmedToDeniedByEventAsync(evento.Id);
+        }
+        
         evento.Status = (int)status;
+        
         await _eventoRepository.UpdateAsync(evento);
     }
 }

@@ -7,4 +7,6 @@ public class EmailSettings
     public string Password { get; set; }
     public bool EnableSsl { get; set; }
     public string ConvidarUrl { get; set; }
+    
+    public string CobrarUrl { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using OrganizadorEventos.DTOs.Participantes;
+﻿using OrganizadorEventos.DTOs.Email;
+using OrganizadorEventos.DTOs.Participantes;
 using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
@@ -13,14 +14,18 @@ public class PagamentoService : IPagamentoService
     private readonly IPixService _pixService;
     private readonly IPagamentoParticipanteRepository _pagamentoParticipanteRepository;    
     private readonly IParticipanteRepository _participanteRepository;
+    private readonly IEmailService _emailService;
+    private readonly IEventoRepository _eventoRepository;
 
 
-    public PagamentoService(IRelatorioEventoService relatorioEventoService, IPixService pixService, IPagamentoParticipanteRepository pagamentoParticipanteRepository, IParticipanteRepository participanteRepository)
+    public PagamentoService(IRelatorioEventoService relatorioEventoService, IPixService pixService, IPagamentoParticipanteRepository pagamentoParticipanteRepository, IParticipanteRepository participanteRepository, IEmailService emailService, IEventoRepository eventoRepository)
     {
         _relatorioEventoService = relatorioEventoService;
         _pixService = pixService;
         _pagamentoParticipanteRepository = pagamentoParticipanteRepository;
         _participanteRepository = participanteRepository;
+        _emailService = emailService;
+        _eventoRepository = eventoRepository;
     }
 
     public async Task<InformacoesPagamentoDTO> InformacoesPagamento(Guid participanteId)
@@ -92,5 +97,71 @@ public class PagamentoService : IPagamentoService
         var pagamentoParticipante = await _pagamentoParticipanteRepository.GetByIdAsync(pagamentoId);
         pagamentoParticipante.Status = (int)status;
         await _pagamentoParticipanteRepository.UpdateAsync(pagamentoParticipante);
+    }
+
+    public async Task CobrarTodosPagamentosPendentesEventos(Guid eventoId)
+    {
+        var evento = await _eventoRepository.GetByIdAsync(eventoId);
+        var usuario = evento.Usuario;
+        var participantes = evento.Participantes.Where(p => p.Status == (int)StatusParticipante.Pendente).Select(p => p.ToRequest()).ToList();
+        
+        _ = Task.Run(async () =>
+        {
+            foreach (var participante in participantes)
+            {
+                var custoParticipante = await _relatorioEventoService.CalcularCustoParticipanteAsync(participante);
+                
+                var cobranca = new CobrancaEmailDTO()
+                {
+                    ToEmail = participante.Email,
+                    ConvidadoNome = participante.Nome,
+                    QuemConvidaNome = usuario.UserName,
+                    EventoNome = evento.Nome,
+                    Valor = custoParticipante.Custo,
+                    CodigoParticipante = participante.Id.ToString()
+                };
+                
+                try
+                {
+                    await _emailService.SendChargeEmailAsync(cobranca);
+                    System.Diagnostics.Debug.WriteLine($"Enviado: {participante.Email}");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Falha ao enviar email de cobrança para {participante.Email}, error: {ex.Message}");
+                }
+            }
+        });
+    }
+
+    public async Task CobrarParticipanteEvento(Guid participanteId)
+    {
+        var participante = await _participanteRepository.GetByIdAsync(participanteId);
+        var evento = participante.Evento;
+        var contato = participante.Contato;
+        var usuario = contato.Usuario;
+        
+        var custoParticipante = await _relatorioEventoService.CalcularCustoParticipanteAsync(participante);
+        
+        var cobranca = new CobrancaEmailDTO()
+        {
+            ToEmail = contato.Email,
+            ConvidadoNome = contato.Nome,
+            QuemConvidaNome = usuario.UserName,
+            EventoNome = evento.Nome,
+            Valor = custoParticipante.Custo,
+            CodigoParticipante = participante.Id.ToString()
+        };
+
+        try
+        {
+            await _emailService.SendChargeEmailAsync(cobranca);
+            System.Diagnostics.Debug.WriteLine($"Enviado cobrança: {contato.Email}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to send charge to {contato.Email}, error: {ex.Message}");
+            throw;
+        }
     }
 }
