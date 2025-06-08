@@ -14,8 +14,8 @@ public class PagamentoService : IPagamentoService
     private readonly IParticipanteRepository _participanteRepository;
     private readonly IEmailService _emailService;
     private readonly IEventoRepository _eventoRepository;
-
-
+    private readonly IRelatorioEventoService _relatorioEventoService;
+    private readonly IPixService _pixService;
     public PagamentoService(IRelatorioEventoService relatorioEventoService, IPixService pixService, IPagamentoParticipanteRepository pagamentoParticipanteRepository, IParticipanteRepository participanteRepository, IEmailService emailService, IEventoRepository eventoRepository)
     {
         _relatorioEventoService = relatorioEventoService;
