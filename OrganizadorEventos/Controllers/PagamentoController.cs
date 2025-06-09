@@ -62,9 +62,17 @@ public class PagamentoController : ControllerBase
     [HttpGet("{ParticipanteId}")]
     public async Task<IActionResult> InformacoesPagamento(Guid ParticipanteId)
     {
-        var informacoes = await _pagamentoService.InformacoesPagamento(ParticipanteId);
-        return Ok(GenericResponse<InformacoesPagamentoDTO>.SucessoResponse(informacoes,
-            "Informações recuperadas com sucesso."));
+        try
+        {
+            var informacoes = await _pagamentoService.InformacoesPagamento(ParticipanteId);
+            return Ok(GenericResponse<InformacoesPagamentoDTO>.SucessoResponse(informacoes,
+                "Informações recuperadas com sucesso."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(GenericResponse<string>.ErroResponse(
+                new List<string> { ex.InnerException?.Message ?? ex.Message }, "Erro ao processar informações do pagamento."));
+        }
     }
 
     [HttpPost("{ParticipanteId}")]
