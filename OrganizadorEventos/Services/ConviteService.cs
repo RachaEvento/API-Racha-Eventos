@@ -5,6 +5,7 @@ using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces.Repositories;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
+using TimeZoneConverter;
 
 namespace OrganizadorEventos.Services;
 
@@ -28,6 +29,9 @@ public class ConviteService : IConviteService
         var usuario = evento.Usuario;
         var participantes = evento.Participantes.Where(p => p.Status == (int)StatusParticipante.Pendente)
             .Select(p => p.ToRequest()).ToList();
+        
+        var timeZone = TZConvert.GetTimeZoneInfo("America/Sao_Paulo");
+        var dataBrasilia = TimeZoneInfo.ConvertTimeFromUtc(evento.DataInicio, timeZone);
 
         _ = Task.Run(async () =>
         {
@@ -39,7 +43,7 @@ public class ConviteService : IConviteService
                     ConvidadoNome = participante.Nome,
                     QuemConvidaNome = usuario.UserName,
                     EventoNome = evento.Nome,
-                    EventoData = evento.DataInicio,
+                    EventoData = dataBrasilia,
                     CodigoConfirmacao = participante.Id.ToString()
                 };
 
@@ -62,6 +66,9 @@ public class ConviteService : IConviteService
         var evento = participante.Evento;
         var contato = participante.Contato;
         var usuario = contato.Usuario;
+        
+        var timeZone = TZConvert.GetTimeZoneInfo("America/Sao_Paulo");
+        var dataBrasilia = TimeZoneInfo.ConvertTimeFromUtc(evento.DataInicio, timeZone);
 
         var convite = new ConviteEmailDTO
         {
@@ -69,7 +76,7 @@ public class ConviteService : IConviteService
             ConvidadoNome = contato.Nome,
             QuemConvidaNome = usuario.UserName,
             EventoNome = evento.Nome,
-            EventoData = evento.DataInicio,
+            EventoData = dataBrasilia,
             CodigoConfirmacao = participante.Id.ToString()
         };
 
