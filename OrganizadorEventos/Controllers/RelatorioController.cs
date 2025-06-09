@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrganizadorEventos.DTOs;
+using OrganizadorEventos.DTOs.Evento;
 using OrganizadorEventos.DTOs.Relatorio;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Response;
@@ -65,6 +66,30 @@ public class RelatorioController : ControllerBase
         {
             Debug.Write(ex.Message);
             return Ok(new { qrCodeBase64 = string.Empty });
+        }
+    }
+    
+    [HttpGet("{eventoId}/relatorio")]
+    [Authorize]
+    public async Task<IActionResult> GetResumoEvento(Guid eventoId)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não identificado." }));
+
+            var relatorio = await _relatorioEventoService.GerarRelatorioEventoAsync(eventoId);
+
+            if (relatorio == null)
+                return NotFound(GenericResponse<string>.ErroResponse(new List<string> { "Evento não encontrado." }));
+
+            return Ok(GenericResponse<RelatorioEventoDTO>.SucessoResponse(relatorio, "Relatório gerado com sucesso."));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, GenericResponse<string>.ErroResponse(new List<string> { ex.Message }, "Erro ao gerar relatório."));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using OrganizadorEventos.DTOs.Participantes;
+﻿using OrganizadorEventos.DTOs.Evento;
+using OrganizadorEventos.DTOs.Participantes;
 using OrganizadorEventos.DTOs.Relatorio;
 using OrganizadorEventos.Model;
 
@@ -9,4 +10,5 @@ public interface IRelatorioEventoService
     Task<List<CustoParticipanteDTO>> CalcularCustoParticipantesAsync(Guid eventoId);
     Task<CustoParticipanteDTO> CalcularCustoParticipanteAsync(Participante participante);
     Task<CustoParticipanteDTO> CalcularCustoParticipanteAsync(ParticipanteDTO participante);
+    Task<RelatorioEventoDTO?> GerarRelatorioEventoAsync(Guid eventoId);
 }

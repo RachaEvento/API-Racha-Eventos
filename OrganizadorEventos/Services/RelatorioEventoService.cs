@@ -1,4 +1,5 @@
-﻿using OrganizadorEventos.DTOs.Participantes;
+﻿using OrganizadorEventos.DTOs.Evento;
+using OrganizadorEventos.DTOs.Participantes;
 using OrganizadorEventos.DTOs.Relatorio;
 using OrganizadorEventos.Enum;
 using OrganizadorEventos.Interfaces;
@@ -103,4 +104,40 @@ public class RelatorioEventoService : IRelatorioEventoService
             Custo = custoTotal
         };
     }
+    public async Task<RelatorioEventoDTO?> GerarRelatorioEventoAsync(Guid eventoId)
+    {
+        var custosParticipantes = await CalcularCustoParticipantesAsync(eventoId);
+    
+        var evento = await _participanteRepository.GetEventoComParticipantesCustosAsync(eventoId);
+        if (evento == null)
+            return null;
+
+        var qtdTotalParticipantes = evento.Participantes.Count;
+        var qtdConfirmados = evento.Participantes.Count(p => p.Status == (int)StatusParticipante.Confirmado);
+        var qtdListas = evento.ListaCustos.Count;
+
+        var custoTotal = evento.ListaCustos
+            .SelectMany(l => l.Custos)
+            .Sum(c => c.Valor);
+
+        var menorCusto = custosParticipantes.Min(p => p.Custo);
+        var maiorCusto = custosParticipantes.Max(p => p.Custo);
+
+        return new RelatorioEventoDTO
+        {
+            NomeEvento = evento.Nome,
+            Descricao = evento.Descricao,
+            DataInicio = evento.DataInicio,
+            DataFinal = evento.DataFinal,
+            Local = evento.LocalNome,
+            Responsavel = evento.Usuario.UserName,
+            QuantidadeParticipantes = qtdTotalParticipantes,
+            QuantidadeConfirmados = qtdConfirmados,
+            QuantidadeListasCusto = qtdListas,
+            CustoTotal = custoTotal,
+            MenorCusto = menorCusto,
+            MaiorCusto = maiorCusto
+        };
+    }
+
 }

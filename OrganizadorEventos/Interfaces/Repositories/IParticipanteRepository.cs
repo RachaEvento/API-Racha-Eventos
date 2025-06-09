@@ -10,4 +10,5 @@ public interface IParticipanteRepository : ICrudRepository<Participante>
     new Task<Participante> GetByIdAsync(Guid id);
     Task<List<Participante>> GetAllConfirmedByEventIdAsync(Guid eventoId);
     Task UpdateAllNonConfirmedToDeniedByEventAsync(Guid eventoId);
+    Task<Evento?> GetEventoComParticipantesCustosAsync(Guid eventoId);
 }
