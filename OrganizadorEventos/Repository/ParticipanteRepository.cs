@@ -135,4 +135,13 @@ public class ParticipanteRepository : CrudRepository<Participante>, IParticipant
             throw new Exception("Ocorreu um erro ao atualizar os participantes para recusado.", ex);
         }
     }
+    public async Task<Evento?> GetEventoComParticipantesCustosAsync(Guid eventoId)
+    {
+        return await _context.Eventos
+            .Include(e => e.Usuario)
+            .Include(e => e.Participantes)
+            .Include(e => e.ListaCustos)
+            .ThenInclude(l => l.Custos)
+            .FirstOrDefaultAsync(e => e.Id == eventoId);
+    }
 }
