@@ -10,4 +10,6 @@ public class Usuario : IdentityUser<Guid>
     public ICollection<Contato> Contatos { get; set; } = new List<Contato>();
     public string? ChavePix { get; set; }
     public TipoChavePix? TipoChavePix { get; set; }
+    public string Name { get; set; }
+
 }
