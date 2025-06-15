@@ -46,11 +46,13 @@ public class AuthService : IAuthService
 
         if (!string.IsNullOrWhiteSpace(registerDto.ChavePix) && registerDto.TipoChavePix == null)
             throw new ArgumentException("Tipo da chave Pix deve ser informado quando uma Chave Pix for fornecida.");
+
         var user = new Usuario
         {
-            UserName = registerDto.Nome,
+            UserName = registerDto.Email,
             Email = registerDto.Email,
             PhoneNumber = registerDto.Numero,
+            Name = registerDto.Nome, 
             ChavePix = registerDto.ChavePix,
             TipoChavePix = registerDto.TipoChavePix
         };
@@ -74,15 +76,15 @@ public class AuthService : IAuthService
         if (user == null)
             throw new ArgumentException("Usuário não encontrado.");
 
-        // Atualizar nome (verifique se UserName é o campo correto para nome)
+        // Atualizar nome real
         if (!string.IsNullOrWhiteSpace(dto.Nome))
-            user.UserName = dto.Nome;
+            user.Name = dto.Nome;
 
         // Atualizar telefone
         if (!string.IsNullOrWhiteSpace(dto.Numero))
             user.PhoneNumber = dto.Numero;
 
-        // Atualizar email
+        // Atualizar email (também usado como UserName)
         if (!string.IsNullOrWhiteSpace(dto.Email))
         {
             var emailResult = await _userManager.SetEmailAsync(user, dto.Email);
@@ -91,6 +93,9 @@ public class AuthService : IAuthService
                 var errosEmail = string.Join("; ", emailResult.Errors.Select(e => e.Description));
                 throw new ArgumentException($"Erro ao atualizar o e-mail: {errosEmail}");
             }
+
+            // Como Email é usado como UserName, atualizar também:
+            user.UserName = dto.Email;
         }
 
         // Atualizar Chave Pix e Tipo de Chave Pix
@@ -124,14 +129,13 @@ public class AuthService : IAuthService
 
         return new UsuarioDTO
         {
-            Nome = user.UserName,
+            Nome = user.Name, 
             Email = user.Email,
             Numero = user.PhoneNumber,
             ChavePix = user.ChavePix,
             TipoChavePix = user.TipoChavePix
         };
     }
-
 
     // Método que gera o token JWT
     private string GenerateJwtToken(Usuario usuario, IList<string> roles)
@@ -141,13 +145,14 @@ public class AuthService : IAuthService
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Name, usuario.UserName),
+            new(JwtRegisteredClaimNames.Name, usuario.Name), 
             new(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, usuario.Email),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        foreach (var role in roles) claims.Add(new Claim(ClaimTypes.Role, role));
+        foreach (var role in roles) 
+            claims.Add(new Claim(ClaimTypes.Role, role));
 
         var token = new JwtSecurityToken(
             _configuration["Jwt:Issuer"],
