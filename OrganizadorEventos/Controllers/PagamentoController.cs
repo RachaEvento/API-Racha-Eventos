@@ -54,6 +54,37 @@ public class PagamentoController : ControllerBase
         return Ok(GenericResponse<ListaPagamentosDTO>.SucessoResponse(listaPagamentos,
             "Pagamentos recuperado com sucesso."));
     }
+    
+    [HttpPost("evento/{EventoId}/cobrar/todos")]
+    [Authorize]
+    public async Task<IActionResult> CobrarParticipantesEvento(Guid EventoId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
+
+        await _pagamentoService.CobrarTodosPagamentosPendentesEventos(EventoId);
+        return Ok(GenericResponse<string>.SucessoResponse("", "Emails encaminhados"));
+    }
+
+    [HttpPost("evento/{EventoId}/cobrar/{ParticipanteId}")]
+    [Authorize]
+    public async Task<IActionResult> CobrarParticipanteEvento(Guid EventoId, Guid ParticipanteId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
+
+        try
+        {
+            await _pagamentoService.CobrarParticipanteEvento(ParticipanteId);
+            return Ok(GenericResponse<string>.SucessoResponse("", "Email encaminhados"));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(GenericResponse<string>.ErroResponse(new List<string>(), "Erro ao encaminhar o email!"));
+        }
+    }
 
     #endregion
 
