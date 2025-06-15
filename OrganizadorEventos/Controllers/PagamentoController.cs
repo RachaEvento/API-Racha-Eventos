@@ -12,13 +12,11 @@ namespace OrganizadorEventos.Controllers;
 [ApiController]
 public class PagamentoController : ControllerBase
 {
-    private readonly IGoogleDriveService _googleDriveService;
     private readonly IPagamentoService _pagamentoService;
 
-    public PagamentoController(IPagamentoService pagamentoService, IGoogleDriveService googleDriveService)
+    public PagamentoController(IPagamentoService pagamentoService)
     {
         _pagamentoService = pagamentoService;
-        _googleDriveService = googleDriveService;
     }
 
     #region Endpoints de gerência do organizador
