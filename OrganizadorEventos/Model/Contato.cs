@@ -34,6 +34,7 @@ public class Contato
     public string Email { get; set; } = null!;
     public string Telefone { get; set; } = null!;
     public bool Ativo { get; set; }
+    public byte[]? Foto { get; set; } 
 
     public Usuario Usuario { get; set; } = null!;
     public ICollection<Participante> Participantes { get; set; } = new List<Participante>();

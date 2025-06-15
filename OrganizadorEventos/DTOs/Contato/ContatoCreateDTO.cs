@@ -1,12 +1,10 @@
-namespace OrganizadorEventos.Request;
+﻿namespace OrganizadorEventos.DTOs.Contato;
 
-public class ContatoDTO
+public class ContatoCreateDTO
 {
-    public Guid? Id { get; set; }
     public string Nome { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string Telefone { get; set; } = null!;
-    
-    public string? FotoBase64 { get; set; } 
     public bool Ativo { get; set; }
+    public IFormFile? Foto { get; set; }
 }

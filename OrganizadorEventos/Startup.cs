@@ -12,6 +12,7 @@ public static class Startup
     public static async Task SeedDefaultUserAsync(UserManager<Usuario> userManager,
         RoleManager<IdentityRole<Guid>> roleManager)
     {
+        var nome = "Usuario Teste";
         var baseUserName = "User";
         var baseUserEmail = "user@mail.com";
         var baseUserPassword = "User@123";
@@ -20,6 +21,7 @@ public static class Startup
         {
             var baseUser = new Usuario
             {
+                Name = nome,
                 UserName = baseUserName,
                 Email = baseUserEmail,
                 EmailConfirmed = true
