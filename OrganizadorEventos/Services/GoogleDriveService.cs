@@ -44,7 +44,8 @@ public class GoogleDriveService : IGoogleDriveService
 
     private async Task InitializeDrive()
     {
-        using var stream = new FileStream("service-account.json", FileMode.Open, FileAccess.Read);
+        using var stream = new FileStream("" +
+                                          "service-account.json", FileMode.Open, FileAccess.Read);
 
         var credential = GoogleCredential.FromStream(stream)
             .CreateScoped(DriveService.Scope.DriveFile); // Use Drive if you need full access

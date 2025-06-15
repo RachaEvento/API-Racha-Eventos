@@ -33,6 +33,11 @@ public class PagamentoService : IPagamentoService
 
         var usuario = participante.Evento.Usuario;
 
+        if (usuario.ChavePix == null)
+        {
+            throw new Exception("Organizador não possui chave pix cadastrada!");
+        }
+
         var nomeLimpo = participante.Contato.Nome.Replace(" ", "");
         var nomeSeguro = nomeLimpo.Substring(0, Math.Min(15, nomeLimpo.Length)).ToUpper();
         var pix = await _pixService.GeneratePixQrCodeAsync(usuario.ChavePix, usuario.UserName, "Criciúma",

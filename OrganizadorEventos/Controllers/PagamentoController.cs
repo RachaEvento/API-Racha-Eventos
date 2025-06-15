@@ -12,13 +12,11 @@ namespace OrganizadorEventos.Controllers;
 [ApiController]
 public class PagamentoController : ControllerBase
 {
-    private readonly IGoogleDriveService _googleDriveService;
     private readonly IPagamentoService _pagamentoService;
 
-    public PagamentoController(IPagamentoService pagamentoService, IGoogleDriveService googleDriveService)
+    public PagamentoController(IPagamentoService pagamentoService)
     {
         _pagamentoService = pagamentoService;
-        _googleDriveService = googleDriveService;
     }
 
     #region Endpoints de gerência do organizador
@@ -54,6 +52,37 @@ public class PagamentoController : ControllerBase
         return Ok(GenericResponse<ListaPagamentosDTO>.SucessoResponse(listaPagamentos,
             "Pagamentos recuperado com sucesso."));
     }
+    
+    [HttpPost("evento/{EventoId}/cobrar/todos")]
+    [Authorize]
+    public async Task<IActionResult> CobrarParticipantesEvento(Guid EventoId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
+
+        await _pagamentoService.CobrarTodosPagamentosPendentesEventos(EventoId);
+        return Ok(GenericResponse<string>.SucessoResponse("", "Emails encaminhados"));
+    }
+
+    [HttpPost("evento/{EventoId}/cobrar/{ParticipanteId}")]
+    [Authorize]
+    public async Task<IActionResult> CobrarParticipanteEvento(Guid EventoId, Guid ParticipanteId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
+
+        try
+        {
+            await _pagamentoService.CobrarParticipanteEvento(ParticipanteId);
+            return Ok(GenericResponse<string>.SucessoResponse("", "Email encaminhados"));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(GenericResponse<string>.ErroResponse(new List<string>(), "Erro ao encaminhar o email!"));
+        }
+    }
 
     #endregion
 
@@ -62,9 +91,17 @@ public class PagamentoController : ControllerBase
     [HttpGet("{ParticipanteId}")]
     public async Task<IActionResult> InformacoesPagamento(Guid ParticipanteId)
     {
-        var informacoes = await _pagamentoService.InformacoesPagamento(ParticipanteId);
-        return Ok(GenericResponse<InformacoesPagamentoDTO>.SucessoResponse(informacoes,
-            "Informações recuperadas com sucesso."));
+        try
+        {
+            var informacoes = await _pagamentoService.InformacoesPagamento(ParticipanteId);
+            return Ok(GenericResponse<InformacoesPagamentoDTO>.SucessoResponse(informacoes,
+                "Informações recuperadas com sucesso."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(GenericResponse<string>.ErroResponse(
+                new List<string> { ex.InnerException?.Message ?? ex.Message }, "Erro ao processar informações do pagamento."));
+        }
     }
 
     [HttpPost("{ParticipanteId}")]
