@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OrganizadorEventos.DTOs.Contato;
 using OrganizadorEventos.Interfaces.Services;
 using OrganizadorEventos.Mappers;
 using OrganizadorEventos.Request;
@@ -70,31 +71,30 @@ public class ContatosController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<GenericResponse<ContatoDTO>>> Create([FromBody] ContatoDTO contatoDto)
+    public async Task<ActionResult<GenericResponse<ContatoDTO>>> Create([FromForm] ContatoCreateDTO contatoDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(GenericResponse<string>.ErroResponse(
-                    ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList(),
-                    "Erro de validação."
-                )
-            );
-
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
 
-        //Cria um novo GUID antes de transformar em entity para garantir que o id seja único.
-        contatoDto.Id = Guid.NewGuid();
+        byte[] fotoBytes = null;
+        if (contatoDto.Foto != null && contatoDto.Foto.Length > 0)
+        {
+            using var ms = new MemoryStream();
+            await contatoDto.Foto.CopyToAsync(ms);
+            fotoBytes = ms.ToArray();
+        }
 
-        var contatoCriado = await _contatoService.CreateAsync(contatoDto.ToEntity(userId));
-        return Ok(GenericResponse<ContatoDTO>.SucessoResponse(contatoCriado.ToRequest(),
-            "Contato criado com sucesso."));
+        var contato = contatoDto.ToEntity(userId, fotoBytes);
+
+        var contatoCriado = await _contatoService.CreateAsync(contato);
+
+        return Ok(GenericResponse<ContatoDTO>.SucessoResponse(contatoCriado.ToRequest(), "Contato criado com sucesso."));
     }
-
+    
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<IActionResult> Update(Guid id, [FromBody] ContatoDTO contatoDto)
+    public async Task<IActionResult> Update(Guid id, [FromForm] ContatoUpdateDTO contatoDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(GenericResponse<string>.ErroResponse(
@@ -108,10 +108,20 @@ public class ContatosController : ControllerBase
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não encontrado." }));
 
-        contatoDto.Id = id;
-        await _contatoService.UpdateAsync(contatoDto.ToEntity(userId));
+        byte[] fotoBytes = null;
+        if (contatoDto.Foto != null && contatoDto.Foto.Length > 0)
+        {
+            using var ms = new MemoryStream();
+            await contatoDto.Foto.CopyToAsync(ms);
+            fotoBytes = ms.ToArray();
+        }
+
+        var contato = contatoDto.ToEntity(userId, fotoBytes); 
+
+        await _contatoService.UpdateAsync(contato);
         return Ok(GenericResponse<string>.SucessoResponse("", "Contato atualizado com sucesso."));
     }
+
 
     [HttpDelete("{id}")]
     [Authorize]
