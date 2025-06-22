@@ -80,16 +80,17 @@ public class RelatorioController : ControllerBase
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return Unauthorized(GenericResponse<string>.ErroResponse(new List<string> { "Usuário não identificado." }));
 
-            var relatorio = await _relatorioEventoService.GerarRelatorioEventoAsync(eventoId);
+            var resultado = await _relatorioEventoService.GerarRelatorioEventoAsync(eventoId);
 
-            if (relatorio == null)
-                return NotFound(GenericResponse<string>.ErroResponse(new List<string> { "Evento não encontrado." }));
+            if (!resultado.Sucesso)
+                return BadRequest(GenericResponse<string>.ErroResponse(new List<string> { resultado.MensagemErro! }));
 
-            return Ok(GenericResponse<RelatorioEventoDTO>.SucessoResponse(relatorio, "Relatório gerado com sucesso."));
+            return Ok(GenericResponse<RelatorioEventoDTO>.SucessoResponse(resultado.Relatorio, "Relatório gerado com sucesso."));
         }
         catch (Exception ex)
         {
             return StatusCode(500, GenericResponse<string>.ErroResponse(new List<string> { ex.Message }, "Erro ao gerar relatório."));
         }
     }
+
 }

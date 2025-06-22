@@ -10,5 +10,5 @@ public interface IRelatorioEventoService
     Task<List<CustoParticipanteDTO>> CalcularCustoParticipantesAsync(Guid eventoId);
     Task<CustoParticipanteDTO> CalcularCustoParticipanteAsync(Participante participante);
     Task<CustoParticipanteDTO> CalcularCustoParticipanteAsync(ParticipanteDTO participante);
-    Task<RelatorioEventoDTO?> GerarRelatorioEventoAsync(Guid eventoId);
+    Task<ResultadoRelatorioEvento> GerarRelatorioEventoAsync(Guid eventoId);
 }

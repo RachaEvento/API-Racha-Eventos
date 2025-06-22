@@ -104,13 +104,28 @@ public class RelatorioEventoService : IRelatorioEventoService
             Custo = custoTotal
         };
     }
-    public async Task<RelatorioEventoDTO?> GerarRelatorioEventoAsync(Guid eventoId)
+    public async Task<ResultadoRelatorioEvento> GerarRelatorioEventoAsync(Guid eventoId)
     {
         var custosParticipantes = await CalcularCustoParticipantesAsync(eventoId);
-    
+
         var evento = await _participanteRepository.GetEventoComParticipantesCustosAsync(eventoId);
         if (evento == null)
-            return null;
+        {
+            return new ResultadoRelatorioEvento
+            {
+                Sucesso = false,
+                MensagemErro = "Evento não encontrado."
+            };
+        }
+
+        if (!custosParticipantes.Any())
+        {
+            return new ResultadoRelatorioEvento
+            {
+                Sucesso = false,
+                MensagemErro = "Nenhum participante confirmado. Relatório não pode ser gerado."
+            };
+        }
 
         var qtdTotalParticipantes = evento.Participantes.Count;
         var qtdConfirmados = evento.Participantes.Count(p => p.Status == (int)StatusParticipante.Confirmado);
@@ -123,7 +138,7 @@ public class RelatorioEventoService : IRelatorioEventoService
         var menorCusto = custosParticipantes.Min(p => p.Custo);
         var maiorCusto = custosParticipantes.Max(p => p.Custo);
 
-        return new RelatorioEventoDTO
+        var relatorio = new RelatorioEventoDTO
         {
             NomeEvento = evento.Nome,
             Descricao = evento.Descricao,
@@ -138,6 +153,11 @@ public class RelatorioEventoService : IRelatorioEventoService
             MenorCusto = menorCusto,
             MaiorCusto = maiorCusto
         };
-    }
 
+        return new ResultadoRelatorioEvento
+        {
+            Sucesso = true,
+            Relatorio = relatorio
+        };
+    }
 }
