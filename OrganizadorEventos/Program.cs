@@ -145,7 +145,10 @@ using (var scope = app.Services.CreateScope())
 
     var userManager = services.GetRequiredService<UserManager<Usuario>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    
     await Startup.SeedDefaultUserAsync(userManager, roleManager);
+    await Startup.SeedContatosAsync(context, userManager);
+    await Startup.SeedLocaisAsync(context, userManager);
 
     foreach (var role in Enum.GetNames(typeof(UserRole)))
         if (!await roleManager.RoleExistsAsync(role))

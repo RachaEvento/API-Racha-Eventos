@@ -118,15 +118,6 @@ public class RelatorioEventoService : IRelatorioEventoService
             };
         }
 
-        if (!custosParticipantes.Any())
-        {
-            return new ResultadoRelatorioEvento
-            {
-                Sucesso = false,
-                MensagemErro = "Nenhum participante confirmado. Relatório não pode ser gerado."
-            };
-        }
-
         var qtdTotalParticipantes = evento.Participantes.Count;
         var qtdConfirmados = evento.Participantes.Count(p => p.Status == (int)StatusParticipante.Confirmado);
         var qtdListas = evento.ListaCustos.Count;
@@ -134,9 +125,15 @@ public class RelatorioEventoService : IRelatorioEventoService
         var custoTotal = evento.ListaCustos
             .SelectMany(l => l.Custos)
             .Sum(c => c.Valor);
+        
+        decimal menorCusto = 0;
+        decimal maiorCusto = 0;
 
-        var menorCusto = custosParticipantes.Min(p => p.Custo);
-        var maiorCusto = custosParticipantes.Max(p => p.Custo);
+        if (custosParticipantes.Any())
+        {
+            menorCusto = custosParticipantes.Min(p => p.Custo);
+            maiorCusto = custosParticipantes.Max(p => p.Custo);
+        }
 
         var relatorio = new RelatorioEventoDTO
         {
